@@ -41,7 +41,7 @@ export const getProjects = cache(async () => {
 
   //@ts-ignore
   const repos = data.user.starredRepositories.nodes;
-  console.log(repos);
+  
   // Filter to only your own repos
   return repos.filter((r: any) => r.owner.login === "blayyyyyk");
 });

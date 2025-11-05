@@ -121,7 +121,6 @@ function EventDrawerMobile({ course }: { course: Course}) {
 }
 
 export default function TimelineClient({ programs }: { programs: Program[]}) {
-    console.log(programs);
     return (
         <div className="flex flex-col w-screen h-[max(auto,_100vh)">
             <Tabs defaultValue={programs.length > 0 ? programs[0]["Program Name"] : ""} className="w-full h-auto p-3 m-0 flex flex-col md:flex-row gap-3">

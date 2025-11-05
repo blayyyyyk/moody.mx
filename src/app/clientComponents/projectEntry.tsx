@@ -107,7 +107,7 @@ export function ProjectExpandedView({ project }: { project: Project }) {
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
                             rehypePlugins={[rehypeHighlight, rehypeKatex]}
-                        >{project.description_md}</ReactMarkdown>
+                        >{project.object.text}</ReactMarkdown>
                     </div>
                 </Card>
             </DrawerDescription>

@@ -75,6 +75,7 @@ export interface Project {
   is_template: boolean
   web_commit_signoff_required: boolean
   repositoryTopics: { nodes: { topic: { name: string } } []}
+  object: { text: string }
   visibility: string
   forks: number
   open_issues: number
