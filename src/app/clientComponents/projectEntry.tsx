@@ -72,14 +72,13 @@ export function ProjectMiniView({ project }: { project: Project }) {
             <div className='flex flex-col gap-3 text-left p-3 flex-grow relative'>
                 <h1 className="text-3xl font-light text-left py-0 m-0">{project.name}</h1>
                 <span className='-ml-1 py-0'>
-                    {project.topics.map((topic: string, index: number) =>
-                        <Badge key={index} variant="outline" className='text-primary mx-1 border-primary text-[10px] rounded-none inline-block my-0'>{topic}</Badge>
+                    {project.repositoryTopics.nodes.map((node: {topic: { name: string }}, index: number) =>
+                        <Badge key={index} variant="outline" className='text-primary mx-1 border-primary text-[10px] rounded-none inline-block my-0'>{node.topic.name}</Badge>
                     )}
                 </span>
                 <p className="my-0 -mt-1 text-wrap text-start">
                     {project.description}
                 </p>
-                <QRCode project={project} className='left-3 bottom-3 -rotate-90 hover:scale-200 transition-transform' />
                 
 
             </div>
@@ -100,8 +99,8 @@ export function ProjectExpandedView({ project }: { project: Project }) {
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Created at {new Date(project.created_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Updated at {new Date(project.updated_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Pushed at {new Date(project.pushed_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
-                            {project.topics.map((topic: string, index: number) =>
-                                <Badge key={index} variant="outline" className='m-1 rounded-none border-primary'>{topic}</Badge>
+                            {project.repositoryTopics.nodes.map((topic: {name: string}, index: number) =>
+                                <Badge key={index} variant="outline" className='m-1 rounded-none border-primary'>{topic.name}</Badge>
                             )}</div>
                     </CardHeader>
                     <div className={`text-lg font-light text-wrap px-3 overflow-x-hidden bg-secondary ${plusJakartaSans.className}`}>

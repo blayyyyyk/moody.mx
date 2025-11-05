@@ -12,6 +12,7 @@ import { Project } from '@/lib/types';
 import { Octokit } from "@octokit/rest";
 import Image from 'next/image';
 import DrawerTrigger from '../clientComponents/drawerTrigger';
+import { getProjects } from '@/lib/github';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,56 +51,16 @@ interface ProjectEntry {
 }
 
 export default async function FeaturedProjects() {
-    const octokit = new Octokit({
-        auth: process.env.NEXT_PUBLIC_GITHUB_API_TOKEN,
-        baseUrl: 'https://api.github.com',
-    })
-
-    //@ts-ignore
-    const allStarredRepos = await octokit.rest.activity.listReposStarredByUser({
-        username: "gg-blake",
-        sort: "updated",
-        direction: "desc"
-    });
-
-    //@ts-ignore
-    const allStarredReposIOwn = allStarredRepos["data"].filter(val => val.owner.login === 'gg-blake')
-
-    //@ts-ignore
-    const projects: Project[] = await Promise.all(allStarredReposIOwn.map(async (repo) => {
-        return await octokit.rest.repos.getContent({
-            owner: 'gg-blake',
-            //@ts-ignore
-            repo: repo.name,
-            path: "README.md",
-        })
-            .then(result => {
-                // content will be base64 encoded
-                //@ts-ignore
-                const content = Buffer.from(result.data.content, 'base64').toString()
-                return {
-                    ...repo,
-                    description_md: content
-                }
-            })
-            .catch((error) => {
-                if (error.status === 404) {
-                    return ""
-                }
-                throw new Error("Internal Error")
-            })
-    }));
-
+    const projects = await getProjects();
 
     return (
         <Carousel heading="Projects">
-            {projects && projects
-            .map((project: Project, index: number) => 
-                <Drawer key={index}>
+            {projects.map((project: any, idx: number) => (
+                <Drawer key={idx}>
                     <ProjectMiniView project={project} />
                     <ProjectExpandedView project={project} />
                 </Drawer>
-            )}
+            ))}
         </Carousel>
-    )
+    );
 }

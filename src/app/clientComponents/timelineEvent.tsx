@@ -1,5 +1,5 @@
 "use client"
-import { ReactNode } from "react"
+import { Fragment, ReactNode } from "react"
 import { Program, Course } from "../../lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -121,13 +121,14 @@ function EventDrawerMobile({ course }: { course: Course}) {
 }
 
 export default function TimelineClient({ programs }: { programs: Program[]}) {
+    console.log(programs);
     return (
         <div className="flex flex-col w-screen h-[max(auto,_100vh)">
             <Tabs defaultValue={programs.length > 0 ? programs[0]["Program Name"] : ""} className="w-full h-auto p-3 m-0 flex flex-col md:flex-row gap-3">
                 <TabsList className="flex flex-col w-full md:max-w-[400px] h-full items-start  m-0 p-0 gap-0 border-b-1 border-primary rounded-none bg-secondary">
                     {programs.map((program: Program, index: number) =>
-                        <>
-                            <TabsTrigger style={{ flexGrow: "0" }} className="m-0 p-0 border-0 w-full justify-start h-[100px]" key={`tabs-trigger-timeline-${index}`} value={program["Program Name"]}>
+                        <Fragment key={`fragment-${index}`}>
+                            <TabsTrigger key={`program-tabs-trigger-${index}`} style={{ flexGrow: "0" }} className="m-0 p-0 border-0 w-full justify-start h-[100px]" key={`tabs-trigger-timeline-${index}`} value={program["Program Name"]}>
                                 <div className="flex flex-row w-full justify-between items-center p-3 relative border-t-1 border-l-1 border-r-1 border-primary hover:text-secondary hover:bg-primary">
                                     <div className="w-auto">
                                         {program["Program Name"]}
@@ -162,7 +163,7 @@ export default function TimelineClient({ programs }: { programs: Program[]}) {
                                     )
                                 }
                             </TabsContent>
-                        </>
+                        </Fragment>
                     )}
                 </TabsList>
                 {programs.map((program: Program, index: number) =>
