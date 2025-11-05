@@ -19,7 +19,7 @@ export default function Links() {
 
             <div className="absolute bottom-6 grid grid-cols-2 grid-rows-2 w-[250px] h-auto text-sm gap-3">
                 <Link href="https://www.instagram.com/blayyyyyk/">Instagram</Link>
-                <Link href="https://github.com/gg-blake" >Github</Link>
+                <Link href="https://github.com/blayyyyyk/" >Github</Link>
                 <Link href="https://www.linkedin.com/in/blake-moody-2626ba11b/">LinkedIn</Link>
                 <Link href="mailto:blake@mpsych.org">Email</Link>
             </div>
