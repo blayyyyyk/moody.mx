@@ -128,7 +128,7 @@ export default function TimelineClient({ programs }: { programs: Program[]}) {
                 <TabsList className="flex flex-col w-full md:max-w-[400px] h-full items-start  m-0 p-0 gap-0 border-b-1 border-primary rounded-none bg-secondary">
                     {programs.map((program: Program, index: number) =>
                         <Fragment key={`fragment-${index}`}>
-                            <TabsTrigger key={`program-tabs-trigger-${index}`} style={{ flexGrow: "0" }} className="m-0 p-0 border-0 w-full justify-start h-[100px]" key={`tabs-trigger-timeline-${index}`} value={program["Program Name"]}>
+                            <TabsTrigger key={`program-tabs-trigger-${index}`} style={{ flexGrow: "0" }} className="m-0 p-0 border-0 w-full justify-start h-[100px]" value={program["Program Name"]}>
                                 <div className="flex flex-row w-full justify-between items-center p-3 relative border-t-1 border-l-1 border-r-1 border-primary hover:text-secondary hover:bg-primary">
                                     <div className="w-auto">
                                         {program["Program Name"]}

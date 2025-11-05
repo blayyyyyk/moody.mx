@@ -99,8 +99,8 @@ export function ProjectExpandedView({ project }: { project: Project }) {
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Created at {new Date(project.created_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Updated at {new Date(project.updated_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
                             <Badge variant="outline" className='opacity-50 border-primary m-1 rounded-none'>Pushed at {new Date(project.pushed_at).toLocaleDateString().replaceAll("/", ".")}</Badge>
-                            {project.repositoryTopics.nodes.map((topic: {name: string}, index: number) =>
-                                <Badge key={index} variant="outline" className='m-1 rounded-none border-primary'>{topic.name}</Badge>
+                            {project.repositoryTopics.nodes.map((node: {topic: { name: string }}, index: number) =>
+                                <Badge key={index} variant="outline" className='m-1 rounded-none border-primary'>{node.topic.name}</Badge>
                             )}</div>
                     </CardHeader>
                     <div className={`text-lg font-light text-wrap px-3 overflow-x-hidden bg-secondary ${plusJakartaSans.className}`}>
