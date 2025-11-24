@@ -66,7 +66,9 @@ const Model = ({ path, position, scale }: { path: string, position: [number, num
 
     useEffect(() => {
         gltf.scene.traverse((child) => {
+            // @ts-ignore
             if (child.isMesh) {
+                // @ts-ignore
                 child.material = new ColorShiftMaterial();
             }
         });
