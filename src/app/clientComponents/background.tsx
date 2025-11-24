@@ -140,7 +140,7 @@ precision mediump float;
 varying vec4 _pos;
 
 void main() {
-	float f  = fract (_pos.z * 50.0);
+	float f  = fract (_pos.y * 50.0);
 	float df = fwidth(_pos.z * 100.0);
 
 	float g = smoothstep(df * 1.0, df * 1.0, f);
@@ -153,7 +153,7 @@ void main() {
 
 export default function Background() {
     return (
-		<div className="absolute w-screen h-screen top-0 left-0">
+		<div className="absolute w-full h-screen top-0 left-0">
 			<Canvas className="absolute top-0 left-0">
 				
 				

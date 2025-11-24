@@ -9,22 +9,16 @@ function Link({ href, children }: { href: string, children: any }) {
 export default function Links() {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center z-10">
-            <div className="w-full font-bold h-auto text-5xl sm:text-[200px] flex justify-center absolute text-primary-50">
-                <div className="w-auto h-auto font-bold">
+            <div className="w-full font-bold h-auto text-5xl sm:text-[200px] flex justify-left absolute text-primary-50">
+                <div className="w-auto h-auto font-bold pl-20">
 
-                    <Heading className='font-semibold text-5xl sm:text-[200px] mix-blend-exclusion'>blake</Heading>
-                    <div className='opacity-20 font-bold text-primary'>moody.mx</div>
+                    <div className='opacity-20 font-bold text-primary'>MPsych Presentation Day:</div>
+                    <Heading className='font-semibold text-5xl sm:text-[200px] mix-blend-exclusion'>MarI/O Kart</Heading>
+                    <Heading className='font-semibold text-xl sm:text-2xl mix-blend-exclusion'>Featuring Blake Moody</Heading>
                 </div>
             </div>
 
-            <div className="absolute bottom-6 grid grid-cols-2 grid-rows-2 w-[250px] h-auto text-sm gap-3">
-                <Link href="https://www.instagram.com/blayyyyyk/">Instagram</Link>
-                <Link href="https://github.com/blayyyyyk/" >Github</Link>
-                <Link href="https://www.linkedin.com/in/blake-moody-2626ba11b/">LinkedIn</Link>
-                <Link href="mailto:blake@mpsych.org">Email</Link>
-            </div>
-            <div className='absolute top-6 right-6'>
-            </div>
+            
         </div>
     )
 } 
