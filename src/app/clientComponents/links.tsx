@@ -12,7 +12,7 @@ export default function Links() {
             <div className="w-full font-bold h-auto text-5xl sm:text-[200px] flex justify-center absolute text-primary-50">
                 <div className="w-auto h-auto font-bold">
 
-                    <Heading className='font-semibold text-5xl sm:text-[200px] mix-blend-exclusion'>blake</Heading>
+                    <Heading className='font-semibold text-5xl sm:text-[200px] mix-blend-exclusion text-primary'>blake</Heading>
                     <div className='opacity-20 font-bold text-primary'>moody.mx</div>
                 </div>
             </div>
