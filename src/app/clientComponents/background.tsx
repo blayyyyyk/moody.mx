@@ -121,7 +121,7 @@ float smoothSparkle(vec2 xy, float t) {
 void main() {
     float f  = fract(_pos.z * 50.0);
     float df = fwidth(_pos.z * 100.0);
-    float g  = smoothstep(df * 5.0, df * 5.0, f);
+    float g  = smoothstep(df * 5.0, df * 5.0, sin(f * 2.0));
 
     // Adjusted color slightly so AsciiEffect has enough contrast to work with
     vec4 c = vec4((1.0 - g) * f,
@@ -248,7 +248,7 @@ function TopoPass() {
 
 export default function Background() {
     return (
-        <div className="absolute w-screen h-screen top-0 left-0 bg-black">
+        <div className="absolute w-full h-screen top-0 left-0 bg-secondary">
             <Canvas>
                 <TopoPass />
                 

@@ -29,7 +29,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavigationMenu />
           {children}
           <SpeedInsights />
           <Analytics />

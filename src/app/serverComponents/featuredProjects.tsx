@@ -11,7 +11,7 @@ import 'highlight.js/styles/github-dark.css';
 import { Project } from '@/lib/types';
 import { Octokit } from "@octokit/rest";
 import Image from 'next/image';
-import DrawerTrigger from '../clientComponents/drawerTrigger';
+import { DrawerTrigger } from '../clientComponents/drawerTrigger';
 import { getProjects } from '@/lib/github';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -50,17 +50,25 @@ interface ProjectEntry {
     commitAPIUrl?: string;
 }
 
+
+
+
 export default async function FeaturedProjects() {
     const projects = await getProjects();
 
     return (
-        <Carousel heading="Projects">
-            {projects.map((project: any, idx: number) => (
-                <Drawer key={idx}>
-                    <ProjectMiniView project={project} />
-                    <ProjectExpandedView project={project} />
-                </Drawer>
-            ))}
-        </Carousel>
+        <div>
+            <Heading className="mx-3 border-primary border-1 p-3 text-wrap">
+                Projects
+            </Heading>
+            <Carousel>
+                {projects.map((project: any, idx: number) => (
+                    <Drawer key={idx}>
+                        <ProjectMiniView project={project} />
+                        <ProjectExpandedView project={project} />
+                    </Drawer>
+                ))}
+            </Carousel>
+        </div>
     );
 }

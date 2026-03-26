@@ -12,7 +12,7 @@ import 'highlight.js/styles/github-dark.css';
 import { Project } from '@/lib/types';
 import { Octokit } from "@octokit/rest";
 import Image from 'next/image';
-import DrawerTrigger from '../clientComponents/drawerTrigger';
+import { DrawerTrigger } from '../clientComponents/drawerTrigger';
 
 const inter = Inter({ subsets: ["latin"] });
 

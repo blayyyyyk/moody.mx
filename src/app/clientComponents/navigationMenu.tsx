@@ -1,18 +1,24 @@
 "use client"
 import {
-    NavigationMenu as GenericNavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuIndicator,
-    NavigationMenuItem,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    NavigationMenuViewport,
-} from "@/components/ui/navigation-menu";
+    NavigationMenu as NavigationMenuGeneric,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
 
 import ThemeToggle from './themeToggle';
-
-import NavigationMenuLink from "./navigationMenuLink";
 import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+function NavigationItem({ href, children }: { href: string, children: any }) {
+    return (
+        <Button className="not-last:border-r border-primary" variant="default" asChild>
+            <Link href={href}>{ children }</Link>
+        </Button>
+    )
+}
 
 export default function NavigationMenu() {
     const isMounted = useRef<boolean>(false);
@@ -24,7 +30,7 @@ export default function NavigationMenu() {
         
 
         document.addEventListener("scroll", (event) => {
-            if (window.scrollY > window.innerHeight) {
+            if (window.scrollY > 30) {
                 navRef.current.style.opacity = "100%";
                 navRef.current.style.display = "flex";
                 return
@@ -38,11 +44,12 @@ export default function NavigationMenu() {
     }, [])
 
     return (
-        <GenericNavigationMenu ref={navRef} className="sticky hidden top-0 z-[99999] bg-transparent p-3 flex-row flex-wrap gap-3">
-            <NavigationMenuLink href="#timeline">Timeline</NavigationMenuLink>
-            <NavigationMenuLink href="#projects">Projects</NavigationMenuLink>
-            <NavigationMenuLink href="#photos">Photos</NavigationMenuLink>
-            <ThemeToggle />
-        </GenericNavigationMenu>
+        <div className="w-screen h-auto sticky top-0 bg-secondary grid grid-cols-5 border-y border-primary z-20">
+            <NavigationItem href="#about">About</NavigationItem>
+            <NavigationItem href="#timeline">Timeline</NavigationItem>
+            <NavigationItem href="#publications">Publications</NavigationItem>
+            <NavigationItem href="#projects">Projects</NavigationItem>
+            <NavigationItem href="#photos">Photos</NavigationItem>
+        </div>
     )
 }
