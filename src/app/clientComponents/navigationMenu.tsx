@@ -44,7 +44,7 @@ export default function NavigationMenu() {
     }, [])
 
     return (
-        <div className="w-screen h-auto sticky top-0 bg-primary grid grid-cols-3 md:grid-cols-5 border-y border-primary z-20 gap-px">
+        <div className="w-screen h-auto sticky top-0 bg-primary grid grid-cols-3 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_100px] border-y border-primary z-20 gap-px">
             <NavigationItem href="#about">About</NavigationItem>
             <NavigationItem href="#timeline">Timeline</NavigationItem>
             <NavigationItem href="#publications">Publications</NavigationItem>
