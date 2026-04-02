@@ -57,7 +57,7 @@ function LoadingImage() {
 
 function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
     return (
-        <div className="font-mono text-xs border-primary absolute bottom-0 bg-secondary">
+        <div className="font-mono text-xs border-primary absolute bottom-0 bg-secondary max-sm:hidden">
             <Marquee pauseOnHover className="border-t-1 border-primary flex flex-row items-center">
                 <Badge className="bg-secondary text-primary">
                     <Calendar data-icon="inline-start" className="stroke-primary" />
@@ -245,7 +245,7 @@ function PhotoMiniView({ photo }: { photo: Photo }) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     return (
-        <div className="rounded-none border-primary border-1 border-b-1 border-b-secondary flex text-left flex-col justify-between h-full z-auto">
+        <div className="rounded-none border-primary sm:border sm:border-b-0 border-b-primary flex text-left flex-col justify-between h-full z-auto">
             <div className="flex flex-col w-full max-w-full h-full overflow-x-hidden relative">
                 <Image className="transition-all duration-1000 object-cover" src={photo.webContentLink} alt={`photobook-${photo.webContentLink}`}
                     onLoad={() => setIsLoaded(true)}
@@ -255,7 +255,10 @@ function PhotoMiniView({ photo }: { photo: Photo }) {
                 <PhotoMetadataMiniView metadata={photo.imageMediaMetadata} />
             </div>
             {!isLoaded && <LoadingImage />}
-            <DrawerTrigger className="border-b-1" label="view photo details" />
+            <DrawerTrigger className="border-b-1 max-sm:hidden" label="view photo details" />
+            <div className="sm:hidden absolute top-3 right-3">
+                <DrawerTrigger className="border-b-1 sm:hidden px-3 border" label="" />
+            </div>
         </div>
     )
 

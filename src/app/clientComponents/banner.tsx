@@ -7,7 +7,7 @@ export default function Banner({ children, speed }: { children: string, speed: n
             <Marquee className="absolute origin-bottom-left left-0 translate-y-[-100%] bg-secondary border-t-1 border-primary" style={{ height: "auto", width: "100vh"}} direction="down" speed={speed} autoFill={true}>
                 <div className='rotate-90'>{children}</div>
             </Marquee>
-            <Marquee className="absolute origin-bottom-right right-[calc(-100vw_+_100vh_+_12px)] translate-y-[-200%] bg-secondary border-t-1 border-primary" style={{ height: "auto", width: "100vh", bottom: "0"}} direction="up" speed={speed} autoFill={true}>
+            <Marquee className="absolute origin-bottom-right right-[calc(-100svw_+_100vh)] translate-y-[-200%] bg-secondary border-t-1 border-primary" style={{ height: "auto", width: "100vh", bottom: "0"}} direction="up" speed={speed} autoFill={true}>
                 <div className='-rotate-90'>{children}</div>
             </Marquee>
             <Marquee className="absolute top-0 translate-y-[-200%] bg-secondary border-b-1 border-primary" direction="left" speed={speed} autoFill={true}>

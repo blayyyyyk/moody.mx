@@ -4,7 +4,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LINKS } from "./links";
+import { LINKS } from "../constants";
 
 const PROFILE_IMAGE = "/profile-cropped.jpg"
 

@@ -37,7 +37,7 @@ export default async function Photobook() {
             <Heading className="border-primary border-1 p-3 text-wrap mb-3">
                 Photos
             </Heading>
-            <div id="photos" className="relative grid grid-cols-3 gap-3 w-full h-auto z-10 grid-rows-[repeat(10,calc(20vh_*_(3_/_4)))] sm:grid-rows-[repeat(10,calc(30vh_*_(3_/_4)))] md:grid-rows-[repeat(10,calc(50vh_*_(3_/_4)))]">
+            <div id="photos" className="relative grid grid-cols-3 max-sm:bg-primary max-sm:border max-sm:border-primary gap-px sm:gap-3 w-full h-auto z-10 grid-rows-[repeat(10,calc(15vh_*_(3_/_4)))] sm:grid-rows-[repeat(10,calc(30vh_*_(3_/_4)))] md:grid-rows-[repeat(10,calc(50vh_*_(3_/_4)))]">
                 {photos && photos.map((photo: Photo, index: number) => {
                     return (
                         <div className={`relative w-full h-full ${index % 6 == 0 || index == 4 ? "col-span-2 row-span-2" : ""}`} key={index}>

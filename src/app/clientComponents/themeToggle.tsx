@@ -22,10 +22,10 @@ export default function ThemeToggle() {
     }, [])
 
     return (
-        <div className="h-full">
+        <div className="h-full w-full">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" className="border-primary text-primary bg-secondary hover:bg-primary hover:text-secondary hover:border-secondary rounded-none">
+                    <Button variant="outline" size="icon" className="text-primary bg-secondary hover:bg-primary hover:text-secondary hover:border-secondary rounded-none w-full border-none">
                         <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                         <span className="sr-only">Toggle theme</span>

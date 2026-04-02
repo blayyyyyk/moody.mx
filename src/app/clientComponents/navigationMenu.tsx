@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 function NavigationItem({ href, children }: { href: string, children: any }) {
     return (
-        <Button className="not-last:border-r border-primary" variant="default" asChild>
+        <Button className="bg-secondary" variant="default" asChild>
             <Link href={href}>{ children }</Link>
         </Button>
     )
@@ -44,12 +44,15 @@ export default function NavigationMenu() {
     }, [])
 
     return (
-        <div className="w-screen h-auto sticky top-0 bg-secondary grid grid-cols-5 border-y border-primary z-20">
+        <div className="w-screen h-auto sticky top-0 bg-primary grid grid-cols-3 md:grid-cols-5 border-y border-primary z-20 gap-px">
             <NavigationItem href="#about">About</NavigationItem>
             <NavigationItem href="#timeline">Timeline</NavigationItem>
             <NavigationItem href="#publications">Publications</NavigationItem>
             <NavigationItem href="#projects">Projects</NavigationItem>
             <NavigationItem href="#photos">Photos</NavigationItem>
+            <div className="bg-secondary">
+                <ThemeToggle />
+            </div>
         </div>
     )
 }
