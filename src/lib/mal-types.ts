@@ -38,7 +38,6 @@ export function currentMalEntry(entries: MalEntry[], kind: MalKind): MalEntry | 
 }
 
 export function malProgress(entry: MalEntry, kind: MalKind) {
-  if (entry.status === "completed" && !entry.revisiting) return "Completed";
   return `${entry.completed.toLocaleString("en")} / ${entry.total?.toLocaleString("en") ?? "?"} ${kind === "manga" ? "chapters" : "episodes"}`;
 }
 

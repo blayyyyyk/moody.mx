@@ -23,7 +23,7 @@ test("ratings descend, tied scores use titles, and unrated entries sort last alp
   const items = [entry(1, "Zeta", null), entry(2, "Zebra", 10), entry(3, "Alpha", 10), entry(4, "Beta", 8), entry(5, "Apple", null)];
   assert.deepEqual(items.sort(compareMalEntries).map(item => item.title), ["Alpha", "Zebra", "Beta", "Apple", "Zeta"]);
   assert.equal(malProgress(entry(1, "Ongoing", 9), "manga"), "3 / ? chapters");
-  assert.equal(malProgress({ ...items[0], status: "completed" }, "anime"), "Completed");
+  assert.equal(malProgress({ ...items[0], status: "completed" }, "anime"), "3 / ? episodes");
 });
 
 test("spotlights use the latest in-progress update, not the highest rating or a completed item", () => {

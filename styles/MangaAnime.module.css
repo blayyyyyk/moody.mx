@@ -29,7 +29,7 @@
 .title { overflow-wrap: anywhere; font-size: 12px; line-height: 18px; text-align: left; }
 .rating { font-size: 14px; text-align: center; font-variant-numeric: tabular-nums; }
 .rating small { font-size: 9px; display: block; }
-.progress { font-size: 10px; line-height: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+.progress { font-size: 12px; line-height: 16px; text-align: right; font-variant-numeric: tabular-nums; }
 .progress small { display: block; color: hsl(var(--muted-foreground)); font-size: 10px; }
 .add { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; width: 100%; border-top: 1px solid hsl(var(--primary)); cursor: pointer; font: inherit; font-size: 12px; }
 .add:disabled { opacity: .5; cursor: not-allowed; }
@@ -47,7 +47,7 @@
 .genres { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0; }
 .genres span { font-size: 10px; border: 1px solid hsl(var(--primary)); padding: 2px 5px; }
 .synopsis { font-size: 12px; line-height: 18px; text-align: left; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.updated { font-size: 10px; line-height: 16px; margin-top: 12px; text-align: left; color: hsl(var(--muted-foreground)); }
+.updated { font-size: 12px; line-height: 16px; margin-top: 12px; text-align: left; color: hsl(var(--muted-foreground)); }
 .sectionFooter { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; line-height: 18px; min-height: 36px; flex-shrink: 0; }
 .retry { min-height: 44px; padding: 8px 12px; border: 1px solid hsl(var(--primary)); flex-shrink: 0; cursor: pointer; }
 .section :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -3px; }
