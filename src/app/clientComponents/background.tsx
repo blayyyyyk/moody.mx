@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Plane } from '@react-three/drei'
-import { AsciiEffect } from 'three-stdlib'
+import useGraphicVisibility from './useGraphicVisibility'
 
 // =============================================================
 // 1. SHADERS & UNIFORMS (Unchanged)
@@ -147,42 +147,53 @@ void main() {
 // 2. THE THREE.JS ASCII EFFECT WRAPPER
 // =============================================================
 
-function AsciiRenderer({ 
-  characters = ' .:*o&8@B', 
-  ...options 
-}) {
+const ASCII_FONT_SIZE = 2 / 0.15
+const ASCII_CHARACTER_GAP = 3
+
+function AsciiRenderer({ characters = ' .:*o&8@B', active, reduced }) {
   const { gl, scene, camera, size } = useThree()
-
-  const effect = useMemo(() => {
-    const e = new AsciiEffect(gl, characters, options)
-    e.domElement.classList.add(
-          'absolute',
-          'top-0',
-          'left-0',
-          'pointer-events-none',
-          'bg-secondary',    // Your custom Tailwind background color
-          'text-primary'     // Or 'text-secondary', 'text-accent', etc.
-    )
-    return e
-  }, [characters, options, gl])
-
+  const lastFrame = useRef(-Infinity)
+  const columns = Math.max(1, Math.floor(size.width / (ASCII_FONT_SIZE * 0.6 + ASCII_CHARACTER_GAP)))
+  const rows = Math.max(1, Math.floor(size.height * 0.15))
+  const target = useMemo(() => new THREE.WebGLRenderTarget(columns, rows, { depthBuffer: false, stencilBuffer: false }), [columns, rows])
+  const pixels = useMemo(() => new Uint8Array(columns * rows * 4), [columns, rows])
+  const text = useMemo(() => {
+    const node = document.createElement('pre')
+    node.setAttribute('aria-hidden', 'true')
+    node.className = 'absolute top-0 left-0 pointer-events-none bg-secondary text-primary'
+    Object.assign(node.style, { margin: '0', padding: '0', border: '0', width: '100%', height: '100%', overflow: 'hidden', fontFamily: 'var(--font-jetbrains-mono), monospace', fontSize: `${ASCII_FONT_SIZE}px`, lineHeight: `${ASCII_FONT_SIZE}px`, letterSpacing: `${ASCII_CHARACTER_GAP}px`, whiteSpace: 'pre' })
+    return node
+  }, [])
   useEffect(() => {
-    gl.domElement.parentNode.appendChild(effect.domElement)
-    return () => {
-        if (gl.domElement.parentNode) {
-            gl.domElement.parentNode.removeChild(effect.domElement)
-        }
+    gl.domElement.parentNode.appendChild(text)
+    return () => text.remove()
+  }, [text, gl])
+  useEffect(() => () => target.dispose(), [target])
+  useEffect(() => {
+    lastFrame.current = -Infinity
+  }, [active, target])
+  useFrame(({ clock }) => {
+    const now = clock.elapsedTime
+    if (active && now - lastFrame.current < 1 / (reduced ? 12 : 30)) return
+    lastFrame.current = now
+    const previous = gl.getRenderTarget()
+    gl.setRenderTarget(target)
+    gl.render(scene, camera)
+    gl.readRenderTargetPixels(target, 0, 0, columns, rows, pixels)
+    gl.setRenderTarget(previous)
+    const lines = []
+    // WebGL's pixel origin is bottom-left; DOM text begins at the top.
+    for (let y = rows - 1; y >= 0; y -= 2) {
+      let line = ''
+      for (let x = 0; x < columns; x++) {
+        const i = (y * columns + x) * 4
+        const brightness = pixels[i + 3] === 0 ? 1 : (0.3 * pixels[i] + 0.59 * pixels[i + 1] + 0.11 * pixels[i + 2]) / 255
+        line += characters[Math.floor(brightness * (characters.length - 1))] || ' '
+      }
+      lines.push(line)
     }
-  }, [effect, gl])
-
-  useEffect(() => {
-    effect.setSize(size.width, size.height)
-  }, [effect, size])
-
-  useFrame(() => {
-    effect.render(scene, camera)
-  }, 1) // Priority 1 ensures standard R3F render is skipped
-
+    text.textContent = lines.join('\n')
+  }, 1)
   return null
 }
 
@@ -190,11 +201,12 @@ function AsciiRenderer({
 // 3. TOPO MAP (Refactored to standard rendering)
 // =============================================================
 
-function TopoPass() {
+function TopoPass({ active, reduced }) {
     const matRef = useRef()
     const { viewport } = useThree()
     const [scale, setScale] = useState([0, 0, 1]);
     const mousePos = useRef([0.0, 0.0]);
+    const time = useRef(0);
 
     useEffect(() => {
         const width = window.innerWidth
@@ -220,17 +232,19 @@ function TopoPass() {
         return () => document.removeEventListener('mousemove', handleMouseMove) // Added cleanup
     }, [])
 
-    useFrame(({ clock }) => {
+    useFrame((_, delta) => {
         if (matRef.current) {
-            matRef.current.uniforms.u_time.value = clock.getElapsedTime();
-            matRef.current.uniforms.u_mousepos.value = mousePos.current;
+            // Keep visible motion continuous without jumping ahead after a pause.
+            if (active) time.current += Math.min(delta, 0.05) * (reduced ? 0.08 : 1);
+            matRef.current.uniforms.u_time.value = time.current;
+            matRef.current.uniforms.u_mousepos.value = reduced ? [0, 0] : mousePos.current;
         }
         // Notice we REMOVED the RenderTarget logic here entirely.
         // It now renders normally to the scene.
     })
 
     return (
-        <Plane scale={scale} args={[1, 1, 512, 512]}>
+        <Plane scale={scale} args={[1, 1, 128, 128]}>
             <shaderMaterial
                 ref={matRef}
                 attach="material"
@@ -247,15 +261,16 @@ function TopoPass() {
 // =============================================================
 
 export default function Background() {
+    const { ref, visible: active, reduced } = useGraphicVisibility('0px')
     return (
-        <div className="absolute w-full h-screen top-0 left-0 bg-secondary">
-            <Canvas>
-                <TopoPass />
+        <div ref={ref} className="absolute w-full h-screen top-0 left-0 bg-secondary" aria-hidden="true" data-hero-animated={active} data-hero-motion={reduced ? 'gentle' : 'full'}>
+            <Canvas dpr={1} frameloop={active ? 'always' : 'demand'} gl={{ antialias: false, powerPreference: 'low-power' }}>
+                <TopoPass active={active} reduced={reduced} />
                 
                 {/* Injects the Ascii DOM element over the canvas.
                     I mapped your custom character set from your old shader!
                 */}
-                <AsciiRenderer characters=" .:*o&8@B" invert={true} />
+                <AsciiRenderer characters=" .:*o&8@B" active={active} reduced={reduced} />
             </Canvas>
         </div>
     )

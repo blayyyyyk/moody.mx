@@ -2,17 +2,12 @@
 
 import { Photo, ImageMediaMetadata } from "@/lib/types";
 import { ReactNode, Suspense, useEffect, useState, useRef } from 'react';
-import * as THREE from 'three'
+import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
 import plusJakartaSans from '../../../styles/fonts';
 import Image from 'next/image';
 import React from 'react';
-import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
-import { useLoader } from "@react-three/fiber";
-import { Environment, Html, OrbitControls } from "@react-three/drei";
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Dialog } from "radix-ui";
-import { useGLTF, shaderMaterial } from '@react-three/drei';
 import '../globals.css';
 import Marquee from "react-fast-marquee";
 import { 
@@ -44,7 +39,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { metadata } from "../layout";
 import { Badge } from "@/components/ui/badge";
-import HeavenlyMesh from "./heavenlyMesh";
+const PhotoCameraScene = dynamic(() => import('./photoCameraScene'), { ssr: false });
 
 function LoadingImage() {
     return (
@@ -87,59 +82,6 @@ function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
         </div>
     )
 }
-
-const ColorShiftMaterial = shaderMaterial(
-    { time: 0, color: new THREE.Color(0.2, 0.0, 0.1) },
-    // vertex shader
-    /*glsl*/`
-      varying vec2 vUv;
-      varying vec4 _pos;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        _pos = gl_Position;
-      }
-    `,
-    // fragment shader
-    /*glsl*/`
-      uniform float time;
-
-      varying vec2 vUv;
-
-      varying vec4 _pos;
-
-      void main() {
-        float f  = fract (_pos.z * 25.0);
-        float df = fwidth(_pos.z * 10.0);
-
-        float g = smoothstep(df * 1.0, df * 3.0, f);
-
-        float c = g;
-
-        gl_FragColor = vec4((1.0 - c) * 0.5, (1.0 - c) * 0.5, (1.0 - c) * 0.5, (1.0 - c));
-      }
-    `
-)
-
-// declaratively
-extend({ ColorShiftMaterial })
-
-const Model = () => {
-    const gltf = useGLTF("/a7.glb");
-    const matRef = useRef<THREE.Mesh>(null!)
-
-    useFrame(({ clock }) =>{
-        if(matRef.current) {
-            matRef.current.rotation.x = Math.PI / 2;
-            matRef.current.rotation.z += 0.0025;
-        }
-    })
-
-    // @ts-ignore
-    return (<><mesh ref={matRef} geometry={gltf.meshes.model_2.geometry} scale={0.002} position={[0, -2, 0]}><colorShiftMaterial time={1} /></mesh></>
-        
-    );
-};
 
 function MetadataEntry({ title, value, children }: { title: string, value: number | string, children?: ReactNode }) {
     return (
@@ -202,12 +144,7 @@ function PhotoMetadataExpandedView({ metadata }: { metadata: ImageMediaMetadata 
                     </MetadataEntry>
                 </CardContent>
                 <div className="w-full">
-                    <Canvas>
-                        <ambientLight intensity={Math.PI / 2} />
-                        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-                        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-                        <Model />
-                    </Canvas>
+                    <PhotoCameraScene />
                 </div>
                 
             </div>
@@ -241,7 +178,7 @@ function PhotoExpandedView({ photo }: { photo: Photo }) {
     )
 }
 
-function PhotoMiniView({ photo }: { photo: Photo }) {
+function PhotoMiniView({ photo, wide }: { photo: Photo; wide: boolean }) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     return (
@@ -250,7 +187,7 @@ function PhotoMiniView({ photo }: { photo: Photo }) {
                 <Image className="transition-all duration-1000 object-cover" src={photo.webContentLink} alt={`photobook-${photo.webContentLink}`}
                     onLoad={() => setIsLoaded(true)}
                     fill
-                    sizes="100vh"
+                    sizes={wide ? "67vw" : "33vw"}
                     style={{objectFit: "cover", opacity: isLoaded ? "1" : "0" }} />
                 <PhotoMetadataMiniView metadata={photo.imageMediaMetadata} />
             </div>
@@ -264,20 +201,10 @@ function PhotoMiniView({ photo }: { photo: Photo }) {
 
 }
 
-export function CameraMesh() {
-    const [isFocused, setIsFocused] = useState(false);
-    
-    return (
-        <div className="w-full h-full" onMouseEnter={() => setIsFocused(true)} onMouseLeave={() => setIsFocused(false)}>
-            <HeavenlyMesh meshPath="/a7.stl" focus={isFocused} scale={0.1} />
-        </div>
-    )
-}
-
-export default function PhotoEntry({ photo }: { photo: Photo }) {
+export default function PhotoEntry({ photo, wide = false }: { photo: Photo; wide?: boolean }) {
     return (
         <Drawer>
-            <PhotoMiniView photo={photo} />
+            <PhotoMiniView photo={photo} wide={wide} />
             <PhotoExpandedView photo={photo} />
         </Drawer>
     )
