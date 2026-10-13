@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T23:36:28Z",
+  "title": "Design System: moody.mx",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Primary ink and strong borders" },
+      "secondary": { "role": "neutral", "displayName": "Page and panel surface" },
+      "blue-400": { "role": "accent", "displayName": "Text-link blue" },
+      "blue-500": { "role": "accent", "displayName": "Link-hover blue" },
+      "glitch-pink": { "role": "effect", "displayName": "Pink heading afterimage" },
+      "glitch-green": { "role": "effect", "displayName": "Green heading afterimage" },
+      "glitch-cyan": { "role": "effect", "displayName": "Cyan heading afterimage" }
+    },
+    "typographyMeta": {
+      "mono": { "displayName": "System monospace", "purpose": "Main-page typography; size roles inherit this family." },
+      "hero": { "displayName": "Hero identity", "purpose": "Lowercase blake from the sm breakpoint." },
+      "hero-mobile": { "displayName": "Phone hero identity", "purpose": "Lowercase blake below the sm breakpoint." },
+      "section": { "displayName": "Section heading", "purpose": "Full-width outlined heading bands from sm." },
+      "section-mobile": { "displayName": "Phone section heading", "purpose": "Full-width outlined heading bands below sm." },
+      "project-title": { "displayName": "Project card title", "purpose": "Lighter-weight heading within a dense project card." },
+      "body": { "displayName": "Body", "purpose": "General prose and project/publication descriptions." },
+      "compact": { "displayName": "Compact text", "purpose": "About descriptions, navigation, and controls." },
+      "small": { "displayName": "Small text", "purpose": "Course descriptions, supporting labels, and footer." },
+      "micro": { "displayName": "Micro text", "purpose": "Project topic labels and perimeter text." }
+    },
+    "shadows": [
+      { "name": "button-shadow-xs", "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "purpose": "Localized shared-button shadow; not a rule to elevate every panel." }
+    ],
+    "motion": [
+      { "name": "heading-cycle", "value": "8.2s", "purpose": "Observed intermittent heading shake and afterimages; reduced-motion alternative is approved but not consistently implemented." },
+      { "name": "heading-easing", "value": "cubic-bezier(.36,.07,.19,.97)", "purpose": "Current heading glitch timing." },
+      { "name": "photo-reveal", "value": "1s", "purpose": "Current photo-preview opacity transition after loading." },
+      { "name": "dialog-transition", "value": "200ms", "purpose": "Shared centered-dialog animation baseline." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Default button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Current compact neutral control, inverse hover, visible shared focus ring, and disabled treatment.",
+      "html": "<button class=\"ds-button\">About</button>",
+      "css": ".ds-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 0; border-radius: 0; background: hsl(var(--secondary, 0 0% 96.1%)); color: hsl(var(--primary, 0 0% 9%)); font: 500 14px/20px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; transition: color 150ms, box-shadow 150ms; outline: none; box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05); } .ds-button:hover { background: hsl(var(--primary, 0 0% 9%)); color: hsl(var(--secondary, 0 0% 96.1%)); } .ds-button:focus-visible { box-shadow: 0 0 0 3px hsl(var(--ring, 0 0% 3.9%) / .5); } .ds-button:disabled { opacity: .5; pointer-events: none; }"
+    },
+    {
+      "name": "Social link button",
+      "kind": "button",
+      "refersTo": "button-link",
+      "description": "Current primary-colored social link with the deliberate blue hover fill.",
+      "html": "<a class=\"ds-social\" href=\"https://github.com/blayyyyyk\">Github</a>",
+      "css": ".ds-social { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 8px 16px; border-radius: 0; background: hsl(var(--secondary, 0 0% 96.1%)); color: hsl(var(--primary, 0 0% 9%)); font: 500 14px/20px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-decoration: underline; text-underline-offset: 4px; transition: color 150ms, box-shadow 150ms; outline: none; } .ds-social:hover { background: var(--color-blue-500, oklch(62.3% .214 259.815)); } .ds-social:focus-visible { box-shadow: 0 0 0 3px hsl(var(--ring, 0 0% 3.9%) / .5); }"
+    },
+    {
+      "name": "Outlined project topic",
+      "kind": "chip",
+      "refersTo": "badge-outline",
+      "description": "Static metadata, not an interactive filter; compact square outline from project cards.",
+      "html": "<span class=\"ds-topic\">pytorch</span>",
+      "css": ".ds-topic { display: inline-block; padding: 2px 8px; border: 1px solid hsl(var(--primary, 0 0% 9%)); border-radius: 0; background: hsl(var(--secondary, 0 0% 96.1%)); color: hsl(var(--primary, 0 0% 9%)); font: 500 10px/16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: nowrap; }"
+    },
+    {
+      "name": "Filled course metadata",
+      "kind": "chip",
+      "refersTo": "badge-filled",
+      "description": "Current compact filled metadata variant used for course location and date.",
+      "html": "<span class=\"ds-filled\">Boston</span>",
+      "css": ".ds-filled { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border: 1px solid transparent; border-radius: 0; background: hsl(var(--primary, 0 0% 9%)); color: hsl(var(--secondary, 0 0% 96.1%)); font: 500 12px/16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: nowrap; }"
+    },
+    {
+      "name": "Project detail trigger",
+      "kind": "button",
+      "refersTo": "detail-trigger",
+      "description": "Appearance-only preview of the current drawer trigger, including icon enlargement. Production drawer behavior comes from Vaul; accessible label coverage still needs work on icon-only variants.",
+      "html": "<button class=\"ds-detail\"><svg class=\"ds-expand\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 15 6 6m0-5v5h-5M9 9 3 3m0 5V3h5m7 6 6-6m-5 0h5v5M9 15l-6 6m5 0H3v-5\"/></svg><span>view project details</span></button>",
+      "css": ".ds-detail { display: flex; width: 100%; align-items: center; justify-content: center; gap: 12px; padding: 12px 0; border: 0; border-top: 1px solid hsl(var(--primary, 0 0% 9%)); border-bottom: 1px solid hsl(var(--primary, 0 0% 9%)); border-radius: 0; background: hsl(var(--secondary, 0 0% 96.1%)); color: hsl(var(--primary, 0 0% 9%)); font: 300 14px/20px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; } .ds-expand { transition: all 150ms; } .ds-detail:hover { background: hsl(var(--primary, 0 0% 9%)); color: hsl(var(--secondary, 0 0% 96.1%)); } .ds-detail:hover .ds-expand { transform: scale(1.3); }"
+    },
+    {
+      "name": "Project information frame",
+      "kind": "card",
+      "description": "A static excerpt of the existing project card: sharp outline, compact inset, lightweight heading, and primary-colored text. Interactive footer is previewed separately.",
+      "html": "<article class=\"ds-project\"><h3 class=\"ds-project-title\">momo-net</h3><p class=\"ds-project-description\">This is an in progress project for a custom generative image diffusion model (images of my dog 🐶) using the UNet architecture</p></article>",
+      "css": ".ds-project { padding: 12px; border: 1px solid hsl(var(--primary, 0 0% 9%)); border-radius: 0; background: hsl(var(--secondary, 0 0% 96.1%)); color: hsl(var(--primary, 0 0% 9%)); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; } .ds-project-title { margin: 0 0 12px; font-size: 30px; font-weight: 300; line-height: 36px; } .ds-project-description { margin: 0; font-size: 16px; font-weight: 400; line-height: 24px; text-align: left; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Computing as a creative medium",
+    "overview": "A personal computing environment and an experimental portfolio in equal measure. Dense, precise information coexists with playful procedural graphics and expressive photography; neither side should be polished away.\n\nComputing and creativity are equally important to Blake. The interface makes that relationship visible: a precise, monospace, thin-bordered framework holds an animated ASCII landscape, glitch typography, interactive wireframe objects, research details, and full-color photography. Preserve both the technical clarity and the handmade, exploratory character.",
+    "keyCharacteristics": [],
+    "rules": [
+      {
+        "name": "The Character-over-Measurements Rule",
+        "body": "Keep the relationships that identify the site: large headings against compact information, dense panels against open graphic areas, restrained interface color against vivid photographs. Existing measurements are the starting point for those relationships, not a reason to clip content or obscure controls.",
+        "section": "overview"
+      }
+    ],
+    "dos": [
+      "Do preserve computing and creativity equally: precise information and expressive visuals belong together.",
+      "Do start from the current tokens and component consumers, then tune measurements to preserve their relationships across content and viewport sizes.",
+      "Do keep both themes first-class, including procedural graphics, borders, controls, and detail surfaces.",
+      "Do retain blue interaction accents, original photo color, and open space around wireframe graphics.",
+      "Do distinguish a protected design decision from a provisional implementation detail or approved requirement that has not shipped.",
+      "Do verify changed surfaces at desktop and phone widths, in both themes, and in relevant hover, focus, expanded, and reduced-motion states."
+    ],
+    "donts": [
+      "Don't replace the protected signature features or drawer/carousel exploration model without Blake's approval.",
+      "Don't let generic component-library rounding or a new global font override the site's square-edged, monospace character.",
+      "Don't remove graphic breathing room merely to make information density uniform across every panel.",
+      "Don't replicate mobile clipping, inaccessible controls, invalid metadata, or sans-serif photo metadata as if they were approved design rules.",
+      "Don't apply stylistic filters to detail photographs or make a crop the only accessible version of an image.",
+      "Don't remove expressive motion for everyone when implementing the approved reduced-motion alternative."
+    ]
+  }
+}

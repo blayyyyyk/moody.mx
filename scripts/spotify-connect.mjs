@@ -7,7 +7,7 @@ const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 const { SPOTIFY_CLIENT_ID: clientId, SPOTIFY_CLIENT_SECRET: clientSecret } = process.env;
 if (!clientId || !clientSecret) {
-    console.error("Add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to .env.local first. See SPOTIFY.md.");
+    console.error("Add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to .env.local first. See AGENTS.md.");
     process.exit(1);
 }
 
