@@ -18,7 +18,7 @@ test("projects fit every responsive boundary in both themes", async ({ browser, 
         const projects = element.querySelector("[class*=repositories]")!.getBoundingClientRect();
         const activity = element.querySelector("aside")!.getBoundingClientRect();
         const columns = element.querySelector("[class*=columns]")!.getBoundingClientRect();
-        const nextHeading = document.querySelector("span#photos")!.getBoundingClientRect();
+        const nextHeading = element.nextElementSibling!.querySelector("h2")!.getBoundingClientRect();
         return { top: Math.abs(projects.top - activity.top), bottom: Math.abs(projects.bottom - activity.bottom), gap: nextHeading.top - columns.bottom };
       });
       if (width >= 768) {
@@ -112,7 +112,7 @@ for (const width of [320, 390, 768, 1440]) test(`README supports markdown, retry
   await expect(trigger).toBeFocused();
 });
 
-test("selected repository README is served by the real API", async ({ page, request }) => {
+test("selected repository README is served by the API and unknown repositories are rejected", async ({ page, request }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   const trigger = page.getByRole("button", { name: /^Read README for/ }).first();
   const name = (await trigger.getAttribute("aria-label"))!.replace("Read README for ", "");
