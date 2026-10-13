@@ -20,6 +20,13 @@ export type MusicSnapshot = {
     recent: MusicTrack[];
     topTrack: MusicTrack | null;
     topArtist: MusicArtist | null;
+    favoritesUnavailable: boolean;
     nowPlaying: MusicTrack | null;
     updatedAt: string;
+};
+
+export type QueueAllowance = {
+    limit: number;
+    remaining: number;
+    resetsAt: number | null;
 };

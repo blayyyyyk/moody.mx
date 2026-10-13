@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { SpotifyError } from "./spotify";
+import type { QueueAllowance } from "./spotify-types";
 
-export function spotifyFailure(error: unknown) {
+export function spotifyFailure(error: unknown, allowance?: QueueAllowance) {
     const known = error instanceof SpotifyError;
     const status = known && error.status === 429 ? 429 : 503;
-    return NextResponse.json({ error: known ? error.message : "Spotify is temporarily unavailable. Please try again shortly." }, {
+    return NextResponse.json({ error: known ? error.message : "Spotify is temporarily unavailable. Please try again shortly.", ...(allowance ? { allowance } : {}) }, {
         status,
         headers: { "Cache-Control": "no-store", ...(status === 429 ? { "Retry-After": String((error as SpotifyError).retryAfter) } : {}) },
     });

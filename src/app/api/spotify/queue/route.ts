@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { spotify } from "@/lib/spotify";
-import { allowRequest, spotifyFailure } from "@/lib/spotify-http";
+import { spotifyFailure } from "@/lib/spotify-http";
+import { createQueueLimiter } from "@/lib/spotify-queue-limit";
+
+const limiter = createQueueLimiter();
+const headers = { "Cache-Control": "no-store" };
+
+export async function GET() {
+    return NextResponse.json({ allowance: limiter.allowance() }, { headers });
+}
 
 export async function POST(request: NextRequest) {
     if (request.headers.get("origin") !== request.nextUrl.origin) return NextResponse.json({ error: "Queue requests must come from this website." }, { status: 403 });
@@ -8,11 +16,21 @@ export async function POST(request: NextRequest) {
     let uri: unknown;
     try { uri = (await request.json()).uri; } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
     if (typeof uri !== "string" || !/^spotify:track:[a-zA-Z0-9]{22}$/.test(uri)) return NextResponse.json({ error: "Choose a valid Spotify track." }, { status: 400 });
-    if (request.cookies.has("spotify-queue-cooldown") || !allowRequest("queue", 10, 60000)) return NextResponse.json({ error: "Please wait a minute before adding another song." }, { status: 429, headers: { "Retry-After": "60" } });
+    // Reserve before awaiting Spotify so concurrent visitors cannot oversubscribe.
+    const slot = limiter.reserve();
+    if (!slot) {
+        const allowance = limiter.allowance();
+        return NextResponse.json({ error: "All three hourly recommendations have been used. Please try again when a slot opens.", allowance }, {
+            status: 429,
+            headers: { ...headers, "Retry-After": String(Math.max(1, Math.ceil(((allowance.resetsAt ?? Date.now() + 3600000) - Date.now()) / 1000))) },
+        });
+    }
     try {
         await spotify(`/me/player/queue?${new URLSearchParams({ uri })}`, "POST");
-        const response = NextResponse.json({ queued: true });
-        response.cookies.set("spotify-queue-cooldown", "1", { httpOnly: true, sameSite: "strict", secure: request.nextUrl.protocol === "https:", maxAge: 60, path: "/api/spotify/queue" });
-        return response;
-    } catch (error) { return spotifyFailure(error); }
+        slot.commit();
+        return NextResponse.json({ queued: true, allowance: limiter.allowance() }, { headers });
+    } catch (error) {
+        slot.release();
+        return spotifyFailure(error, limiter.allowance());
+    }
 }

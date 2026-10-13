@@ -2,7 +2,8 @@ import { after, test } from "node:test";
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { musicSnapshot, searchMusic, spotify, SpotifyError } from "../src/lib/spotify";
-import { POST } from "../src/app/api/spotify/queue/route";
+import { GET, POST } from "../src/app/api/spotify/queue/route";
+import { createQueueLimiter } from "../src/lib/spotify-queue-limit";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = { ...process.env };
@@ -17,6 +18,8 @@ test("Spotify server integration and public queue boundaries", async (t) => {
     const calls: string[] = [];
     let queueStatus = 204;
     let forceUnauthorized = false;
+    let favoritesFail = false;
+    let currentlyPlaying = false;
     const item = {
         id: "1234567890123456789012", uri: "spotify:track:1234567890123456789012", name: "Test track",
         artists: [{ name: "Test artist" }], album: { name: "Test album", images: [{ url: "https://example.com/art.jpg" }] },
@@ -32,7 +35,8 @@ test("Spotify server integration and public queue boundaries", async (t) => {
         }
         if (forceUnauthorized) { forceUnauthorized = false; return new Response(null, { status: 401 }); }
         if (url.includes("recently-played")) return Response.json({ items: [{ track: item, played_at: "2026-10-11T10:00:00Z" }, { track: item, played_at: "2026-10-12T10:00:00Z" }] });
-        if (url.includes("currently-playing")) return new Response(null, { status: 204 });
+        if (url.includes("currently-playing")) return currentlyPlaying ? Response.json({ is_playing: true, currently_playing_type: "track", item }) : new Response(null, { status: 204 });
+        if (url.includes("/me/top/") && favoritesFail) return new Response(null, { status: 503 });
         if (url.includes("top/tracks")) return Response.json({ items: [item] });
         if (url.includes("top/artists")) return Response.json({ items: [{ name: "Test artist", images: [], external_urls: { spotify: "https://open.spotify.com/artist/test" } }] });
         if (url.includes("/search")) return Response.json({ tracks: { items: [item] } });
@@ -70,22 +74,77 @@ test("Spotify server integration and public queue boundaries", async (t) => {
         assert.equal((await POST(request({ uri: "spotify:album:invalid" }))).status, 400);
         assert.equal(calls.length, count);
     });
-    await t.test("queues a track and enforces the visitor cooldown", async () => {
+    await t.test("queues a track and reports the shared remaining allowance", async () => {
         const response = await POST(request({ uri: item.uri }));
         assert.equal(response.status, 200);
-        assert.deepEqual(await response.json(), { queued: true });
-        assert.match(response.headers.get("set-cookie")!, /HttpOnly/i);
-        assert.equal((await POST(request({ uri: item.uri }, undefined, "spotify-queue-cooldown=1"))).status, 429);
+        const body = await response.json();
+        assert.equal(body.queued, true);
+        assert.equal(body.allowance.remaining, 2);
+        assert.equal(body.allowance.limit, 3);
+        assert.equal((await (await GET()).json()).allowance.remaining, 2);
     });
     await t.test("explains inactive playback and preserves Spotify rate-limit timing", async () => {
         queueStatus = 404;
         const inactive = await POST(request({ uri: item.uri }));
         assert.equal(inactive.status, 503);
-        assert.match((await inactive.json()).error, /No active Spotify player/);
+        const failure = await inactive.json();
+        assert.match(failure.error, /No active Spotify player/);
+        assert.equal(failure.allowance.remaining, 2);
         queueStatus = 429;
         await assert.rejects(() => spotify("/me/player/queue", "POST"), (error: unknown) => error instanceof SpotifyError && error.retryAfter === 90);
         const limited = await POST(request({ uri: item.uri }));
         assert.equal(limited.status, 429);
         assert.equal(limited.headers.get("retry-after"), "90");
+        assert.equal((await (await GET()).json()).allowance.remaining, 2, "failed writes must not consume recommendation slots");
     });
+    await t.test("concurrent visitors share three slots and a fourth does not reach Spotify", async () => {
+        queueStatus = 204;
+        const queueCalls = () => calls.filter((url) => url.includes("/queue")).length;
+        const before = queueCalls();
+        const responses = await Promise.all(Array.from({ length: 3 }, () => POST(request({ uri: item.uri }))));
+        assert.deepEqual(responses.map((response) => response.status).sort(), [200, 200, 429]);
+        assert.equal(queueCalls() - before, 2);
+        const rejected = responses.find((response) => response.status === 429)!;
+        assert.ok(Number(rejected.headers.get("retry-after")) > 3500);
+        assert.equal((await rejected.json()).allowance.remaining, 0);
+        assert.equal((await (await GET()).json()).allowance.remaining, 0);
+    });
+    await t.test("favorites failures retain rankings without blocking playing-to-idle updates", async () => {
+        const originalNow = Date.now;
+        let time = originalNow() + 16 * 60 * 1000;
+        Date.now = () => time;
+        try {
+            favoritesFail = true;
+            currentlyPlaying = true;
+            const playing = await musicSnapshot();
+            assert.equal(playing.nowPlaying?.id, item.id);
+            assert.equal(playing.topTrack?.id, item.id);
+            assert.equal(playing.favoritesUnavailable, true);
+            time += 21000;
+            currentlyPlaying = false;
+            const idle = await musicSnapshot();
+            assert.equal(idle.nowPlaying, null);
+            assert.equal(idle.favoritesUnavailable, true);
+        } finally { Date.now = originalNow; }
+    });
+});
+
+test("rolling hourly slots expire independently and released failures are reusable", () => {
+    let now = 1000;
+    const limiter = createQueueLimiter(() => now);
+    const first = limiter.reserve()!;
+    first.commit();
+    now += 1000;
+    const second = limiter.reserve()!;
+    second.commit();
+    const third = limiter.reserve()!;
+    assert.equal(limiter.reserve(), null, "pending work reserves a slot immediately");
+    third.release();
+    assert.equal(limiter.allowance().remaining, 1);
+    limiter.reserve()!.commit();
+    now = 3601000;
+    assert.equal(limiter.allowance().remaining, 1, "only the oldest slot expires after one hour");
+    now += 1000;
+    assert.equal(limiter.allowance().remaining, 3);
+    assert.equal(limiter.allowance().resetsAt, null);
 });

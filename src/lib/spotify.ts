@@ -83,7 +83,7 @@ function track(item: SpotifyTrack): MusicTrack {
 
 let snapshot: { data: MusicSnapshot; expires: number } | undefined;
 let snapshotRequest: Promise<MusicSnapshot> | undefined;
-let favorites: { track: MusicTrack | null; artist: MusicArtist | null; expires: number } | undefined;
+let favorites: { track: MusicTrack | null; artist: MusicArtist | null; expires: number; unavailable: boolean } | undefined;
 
 export async function musicSnapshot(): Promise<MusicSnapshot> {
     if (snapshot && snapshot.expires > Date.now()) return snapshot.data;
@@ -94,20 +94,33 @@ export async function musicSnapshot(): Promise<MusicSnapshot> {
             spotify<{ is_playing: boolean; currently_playing_type: string; item: SpotifyTrack | null }>("/me/player/currently-playing"),
         ]);
         if (!favorites || favorites.expires <= Date.now()) {
-            const [tracks, artists] = await Promise.all([
-                spotify<{ items: SpotifyTrack[] }>("/me/top/tracks?time_range=short_term&limit=1"),
-                spotify<{ items: { name: string; images: { url: string }[]; external_urls: { spotify: string } }[] }>("/me/top/artists?time_range=short_term&limit=1"),
-            ]);
-            const artist = artists?.items[0];
-            favorites = {
-                track: tracks?.items[0] ? track(tracks.items[0]) : null,
-                artist: artist ? { name: artist.name, image: artist.images[0]?.url ?? null, url: artist.external_urls.spotify } : null,
-                expires: Date.now() + 15 * 60 * 1000,
-            };
+            try {
+                const [tracks, artists] = await Promise.all([
+                    spotify<{ items: SpotifyTrack[] }>("/me/top/tracks?time_range=short_term&limit=1"),
+                    spotify<{ items: { name: string; images: { url: string }[]; external_urls: { spotify: string } }[] }>("/me/top/artists?time_range=short_term&limit=1"),
+                ]);
+                const artist = artists?.items[0];
+                favorites = {
+                    track: tracks?.items[0] ? track(tracks.items[0]) : null,
+                    artist: artist ? { name: artist.name, image: artist.images[0]?.url ?? null, url: artist.external_urls.spotify } : null,
+                    expires: Date.now() + 15 * 60 * 1000,
+                    unavailable: false,
+                };
+            } catch (error) {
+                // Rankings must not prevent a successful playback response from
+                // parking the arm or updating the current track.
+                const retryAfter = error instanceof SpotifyError ? error.retryAfter : 30;
+                favorites = {
+                    track: favorites?.track ?? null, artist: favorites?.artist ?? null,
+                    expires: Date.now() + Math.max(30, retryAfter) * 1000,
+                    unavailable: true,
+                };
+            }
         }
         const data: MusicSnapshot = {
             recent: (recent?.items ?? []).filter((item) => item.track?.id).sort((a, b) => b.played_at.localeCompare(a.played_at)).map((item) => ({ ...track(item.track), playedAt: item.played_at })),
             topTrack: favorites.track, topArtist: favorites.artist,
+            favoritesUnavailable: favorites.unavailable,
             nowPlaying: playing?.is_playing && playing.currently_playing_type === "track" && playing.item?.id ? track(playing.item) : null,
             updatedAt: new Date().toISOString(),
         };
