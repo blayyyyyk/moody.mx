@@ -28,7 +28,7 @@ globalThis.fetch = async (input, init) => {
   }
   if (url.hostname === "www.googleapis.com" && url.pathname === "/drive/v2/files") {
     return Response.json({ items: [{
-      id: "fixture-photo", title: "Fixture photo", fileExtension: "jpg", fileSize: "1000000",
+      id: "fixture-photo", title: "Fixture photo", mimeType: "image/jpeg", fileExtension: "jpg", fileSize: "1000000",
       webContentLink: "/IMG_5008.jpg", imageMediaMetadata: {
         width: 1200, height: 800, date: "2026:10:12 12:00:00", aperture: 2.8,
         exposureTime: 0.01, isoSpeed: 100, focalLength: 35, cameraMake: "Sony",

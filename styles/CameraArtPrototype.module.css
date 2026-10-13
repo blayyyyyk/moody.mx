@@ -1,0 +1,28 @@
+.controls {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    align-items: stretch;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    border: 1px solid hsl(var(--primary));
+    background: hsl(var(--secondary));
+    color: hsl(var(--primary));
+    font: 12px/16px var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+.controls button { display: grid; place-items: center; min-width: 44px; padding: 8px; cursor: pointer; }
+.controls button:hover { background: hsl(var(--primary)); color: hsl(var(--secondary)); }
+.controls button:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -4px; }
+.state { display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 8px; text-align: center; }
+.state strong { font-weight: 500; }
+.state span { color: hsl(var(--muted-foreground)); }
+.exit { border-left: 1px solid hsl(var(--primary)); }
+
+@media (max-width: 639px) {
+    .state span { display: none; }
+    .exit { max-width: 80px; }
+}

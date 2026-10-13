@@ -8,15 +8,18 @@ interface TriggerI {
     label?: string;
     className?: string;
     condenseForMobile?: boolean;
+    ariaLabel?: string;
 }
 
 export function DrawerTrigger({
     label,
     className,
     condenseForMobile = true,
+    ariaLabel,
 }: TriggerI) {
     return (
         <GenericDrawerTrigger
+            aria-label={ariaLabel ?? label ?? "Open details"}
             className={`group w-full py-3 border-primary bg-secondary border-t-1 flex flex-row justify-center items-center hover:bg-primary gap-3 ${className}`}
         >
             <Expand className="w-4 h-4 stroke-primary group-hover:stroke-secondary group-hover:scale-130 group-hover:stroke-2 transition-all" />

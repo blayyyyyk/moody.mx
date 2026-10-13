@@ -1,0 +1,36 @@
+.row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    border: 1px solid hsl(var(--primary));
+    background: hsl(var(--primary));
+    margin-bottom: var(--photo-gap, 12px);
+}
+
+.cell {
+    min-width: 0;
+    margin: 0;
+    background: hsl(var(--secondary));
+    color: hsl(var(--primary));
+}
+
+.drawing { display: block; width: 100%; height: auto; }
+.trace { width: 100%; aspect-ratio: 4 / 3; background: currentColor; mask-repeat: no-repeat; mask-position: center; mask-size: contain; }
+.modelRender { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+.surface { fill: hsl(var(--secondary)); }
+.fine { stroke-width: 0.85; }
+
+.caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 8px 12px;
+    border-top: 1px solid hsl(var(--primary));
+    font-size: 12px;
+    line-height: 16px;
+}
+
+@media (max-width: 639px) {
+    .row { border: 0; }
+    .caption { padding: 4px 6px; }
+}

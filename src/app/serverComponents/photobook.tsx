@@ -1,49 +1,33 @@
-import PhotoEntry from "../clientComponents/photoEntry";
-import { PhotosResponse, Photo } from "@/lib/types";
+import type { Photo } from "@/lib/types";
+import { connection } from "next/server";
+import { fetchDrivePhotos } from "@/lib/drive-photos";
+import { featuredPhotoIds } from "@/lib/photos";
+import PhotoMasonry from "../clientComponents/photoMasonry";
+import ModelCameraViews from "../clientComponents/modelCameraViews";
+import CameraArtPrototype from "../clientComponents/cameraArtPrototype";
 import Heading from "../clientComponents/heading";
-
-
-const apiKey = process.env.NEXT_PUBLIC_GCP_API_KEY; // Use your environment variable for the Google API key
-
-export async function fetchDrivePhotos(folderId: string) {
-    const myHeaders = new Headers();
-    myHeaders.append("Accept", "application/json");
-
-    const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
-        next: { revalidate: 300 }
-    };
-    
-    // @ts-ignore
-    const response = await fetch(`https://www.googleapis.com/drive/v2/files?q='${folderId}' in parents&key=${apiKey}`, requestOptions);
-    const result: PhotosResponse = await response.json();
-    const photos = result.items ?? [];
-    return photos
-}
-
+import styles from "../../../styles/PhotoMasonry.module.css";
 
 export default async function Photobook() {
-    const folderId = process.env.NEXT_PUBLIC_SHARED_FOLDER_ID; // Retrieve the folder ID from the query parameter
-    const photos = folderId ? await fetchDrivePhotos(folderId) : [];
-    
+    // Re-roll the featured selection per request, while caching Drive metadata.
+    await connection();
+    const folderId = process.env.NEXT_PUBLIC_SHARED_FOLDER_ID;
+    let photos: Photo[] = [];
+    let unavailable = false;
+    try {
+        if (folderId) photos = await fetchDrivePhotos(folderId);
+    } catch {
+        unavailable = true;
+    }
     return (
-        <div className="w-full px-3">
-            <Heading className="border-primary border-1 p-3 text-wrap mb-3">
-                Photos
-            </Heading>
-            <div id="photos" className="relative grid grid-cols-3 max-sm:bg-primary max-sm:border max-sm:border-primary gap-px sm:gap-3 w-full h-auto z-10 grid-rows-[repeat(10,calc(15vh_*_(3_/_4)))] sm:grid-rows-[repeat(10,calc(30vh_*_(3_/_4)))] md:grid-rows-[repeat(10,calc(50vh_*_(3_/_4)))]">
-                {photos && photos.map((photo: Photo, index: number) => {
-                    const featured = index % 6 == 0 || index == 4;
-                    return (
-                        <div className={`relative w-full h-full ${featured ? "col-span-2 row-span-2" : ""}`} key={index}>
-                            <PhotoEntry key={index} photo={photo} wide={featured} />
-                        </div>
-                    )
-                })}
-                
+        <section className="w-full px-3" aria-labelledby="photos">
+            <Heading className="border-primary border-1 p-3 text-wrap mb-3 scroll-mt-[90px] md:scroll-mt-12">Photos</Heading>
+            <div className={styles.frame}>
+                {process.env.NODE_ENV === "development" ? <CameraArtPrototype /> : <ModelCameraViews />}
+                {unavailable
+                    ? <p role="status" className="border border-primary p-3 text-sm text-muted-foreground">The photo library is temporarily unavailable. Please refresh to try again.</p>
+                    : <PhotoMasonry photos={photos} featuredIds={featuredPhotoIds(photos)} />}
             </div>
-        </div>
-    )
+        </section>
+    );
 }

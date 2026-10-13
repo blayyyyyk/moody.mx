@@ -141,6 +141,7 @@ export interface PhotosResponse {
   selfLink: string
   incompleteSearch: boolean
   items: Photo[]
+  nextPageToken?: string
 }
 
 export interface Photo {
@@ -173,6 +174,7 @@ export interface Photo {
   spaces: string[]
   id: string
   title: string
+  description?: string
   labels: Labels
   explicitlyTrashed: boolean
   createdDate: string

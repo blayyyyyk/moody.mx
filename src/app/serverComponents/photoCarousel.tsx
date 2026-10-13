@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselItem } from "../clientComponents/emblaCarousel";
-import { fetchDrivePhotos } from "./photobook";
+import { fetchDrivePhotos } from "@/lib/drive-photos";
 import Image from "next/image";
 import { Photo } from "@/lib/types";
 
