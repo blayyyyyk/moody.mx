@@ -10,7 +10,8 @@
     "spotify:connect": "node scripts/spotify-connect.mjs",
     "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts && node --test tests/spotify-connect.test.mjs",
     "test:music": "playwright test",
-    "test:projects": "playwright test --config playwright.projects.config.ts"
+    "test:projects": "playwright test --config playwright.projects.config.ts",
+    "test:github": "NODE_OPTIONS=--conditions=react-server tsx --test tests/github.test.ts"
   },
   "dependencies": {
     "@next/env": "^15.1.7",

@@ -30,6 +30,9 @@ or external account is required. Install Chromium with `npx playwright install c
 if it is not already available. To check an existing server against its configured
 data instead, set `PROJECTS_TEST_URL` to its URL.
 
+Run `npm run test:github` for mocked server checks covering pagination, public
+repository selection, partial upstream failures, and README access restrictions.
+
 The production Projects section uses the server-only `GITHUB_API_KEY` for its
 contribution calendar. Public repositories and activity also work without a token,
 subject to GitHub's unauthenticated rate limit. Only Blake's public, owned, starred
