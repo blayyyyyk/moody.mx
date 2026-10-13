@@ -109,7 +109,7 @@ for (const width of [320, 390, 768, 1440]) test(`README supports markdown, retry
   await expect(dialog.getByRole("heading", { name: "Example README" })).toBeVisible();
   await expect(dialog.getByRole("link", { name: "relative link" })).toHaveAttribute("href", /\/blob\/main\/docs\/guide.md$/);
   await expect(dialog.locator("img")).toHaveAttribute("src", /raw.githubusercontent.com\/.*\/main\/docs\/images\/example.png$/);
-  await expect(dialog.getByText("unsafe", { exact: true })).toHaveAttribute("href", "");
+  await expect(dialog.getByText("unsafe", { exact: true })).not.toHaveAttribute("href", /javascript:/);
     expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     await expect(dialog.getByRole("button", { name: "Close README" })).toBeInViewport();
     if (width === 390 || width === 1440) await page.screenshot({ path: `test-results/readme-${width}.png`, animations: "disabled" });
@@ -127,4 +127,38 @@ test("selected repository README is served by the API and unknown repositories a
   expect((await response.json()).text.length).toBeGreaterThan(0);
   const invalid = await request.get("/api/projects/not-a-selected-project/readme");
   expect(invalid.status()).toBe(404);
+});
+
+test("README renders safe HTML, inline headings, math and internal anchors", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.route("**/api/projects/*/readme", route => route.fulfill({ json: {
+    path: "docs/README.md", branch: "main",
+    text: [
+      "# Run `example` with **care**",
+      "[Jump to usage](#usage)",
+      '<h2 id="usage">Usage <code>example</code></h2>',
+      '<a id="reference"></a>',
+      '<details><summary>More information</summary><p>Expanded documentation.</p></details>',
+      '<picture><source srcset="javascript:alert(1)"><img src="assets/example.svg" alt="HTML example" onerror="alert(1)" /></picture>',
+      '<script>alert(1)</script><iframe src="https://example.com"></iframe>',
+      '<a href="javascript:alert(1)" onclick="alert(1)">Unsafe HTML link</a>',
+      "Inline math: $x^2$.",
+    ].join("\n\n"),
+  } }));
+  await page.route("https://raw.githubusercontent.com/**", route => route.fulfill({
+    contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40"><rect width="160" height="40" fill="#888"/></svg>',
+  }));
+  await expect(page.getByRole("button", { name: "Scroll projects down" })).toBeEnabled();
+  await page.getByRole("button", { name: /^Read README for/ }).first().click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("heading", { name: "Run example with care" })).toHaveCSS("display", "block");
+  await expect(dialog.getByRole("heading", { name: "Usage example" })).toHaveAttribute("id", "readme-usage");
+  await expect(dialog.getByRole("link", { name: "Jump to usage" })).toHaveAttribute("href", "#readme-usage");
+  await expect(dialog.locator("#readme-reference")).toHaveCount(1);
+  await dialog.locator("summary").click();
+  await expect(dialog.getByText("Expanded documentation.")).toBeVisible();
+  await expect(dialog.getByRole("img", { name: "HTML example" })).toHaveAttribute("src", /\/main\/docs\/assets\/example.svg$/);
+  await expect(dialog.locator("script, iframe, [onerror], [onclick], [srcset]")).toHaveCount(0);
+  await expect(dialog.getByText("Unsafe HTML link")).not.toHaveAttribute("href", /javascript:/);
+  await expect(dialog.locator("math")).toHaveCount(1);
 });

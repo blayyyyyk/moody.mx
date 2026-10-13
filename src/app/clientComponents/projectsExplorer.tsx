@@ -8,12 +8,26 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import type { GitHubProject, ProjectsData } from "@/lib/projects-types";
 import styles from "../../../styles/Projects.module.css";
 
 const profile = "https://github.com/blayyyyyk";
 const levels = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE"];
+const readmeSchema = {
+  ...defaultSchema,
+  clobberPrefix: "readme-",
+  strip: [...(defaultSchema.strip ?? []), "style", "iframe", "object", "embed"],
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [["className", /^language-./, "math-inline", "math-display"]],
+    // Fall back to the picture's img; srcset is not a single URL and must not
+    // bypass the URL validation/resolution applied to README image sources.
+    source: ["media", "type"],
+  },
+};
 const dateLabel = (value: string) => new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(value));
 
 function Contributions({ calendar }: Pick<ProjectsData, "calendar">) {
@@ -100,7 +114,8 @@ function ProjectReadme({ project }: { project: GitHubProject }) {
   const directory = readme.path.slice(0, readme.path.lastIndexOf("/") + 1);
   const branch = encodeURIComponent(readme.branch);
   return <article className={styles.markdown}>
-    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeHighlight, rehypeKatex, [rehypeSlug, { prefix: "readme-" }]]}
+    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeRaw, [rehypeSanitize, readmeSchema], rehypeHighlight, rehypeKatex, [rehypeSlug, { prefix: "readme-" }]]}
       urlTransform={(url, key) => {
         const safe = defaultUrlTransform(url);
         if (!safe) return "";
@@ -110,10 +125,10 @@ function ProjectReadme({ project }: { project: GitHubProject }) {
         return new URL(safe.replace(/^\//, ""), `${base}${safe.startsWith("/") ? "" : directory}`).href;
       }}
       components={{
-        a: ({ children, href }) => <a href={href} target={href?.startsWith("#") ? undefined : "_blank"} rel="noreferrer">{children}</a>,
+        a: ({ node: _node, children, href, ...props }) => <a {...props} href={href} target={href?.startsWith("#") ? undefined : "_blank"} rel="noreferrer">{children}</a>,
         // README images have arbitrary hosts and dimensions; preserve their intrinsic aspect ratio.
         // eslint-disable-next-line @next/next/no-img-element
-        img: ({ src, alt }) => <img src={src} alt={alt ?? ""} loading="lazy" />,
+        img: ({ node: _node, src, alt, ...props }) => <img {...props} src={src} alt={alt ?? ""} loading="lazy" />,
         table: ({ children }) => <div className={styles.tableScroll}><table>{children}</table></div>,
       }}
     >{readme.text}</ReactMarkdown>
