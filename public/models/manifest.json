@@ -1,0 +1,22 @@
+{
+  "simplify_Enchiridion_": {
+    "source": "simplify_Enchiridion_.stl",
+    "sourceSha256": "1a4c14f22853ef7afba20ee5c390310d75aeffc4c3f142285431d2ef2ca53a9b",
+    "sourceBytes": 96460084,
+    "bytes": 614716,
+    "originalTriangles": 1929200,
+    "triangles": 20000,
+    "edgeSegments": 25119,
+    "relativeError": 0.000809229095466435
+  },
+  "RTX_3080_FE": {
+    "source": "RTX_3080_FE.stl",
+    "sourceSha256": "08c71eab5774f581045e2da82c4a95ec83b237d2a6a95f5744545ca1d5c266cb",
+    "sourceBytes": 6167384,
+    "bytes": 486488,
+    "originalTriangles": 123346,
+    "triangles": 20000,
+    "edgeSegments": 15297,
+    "relativeError": 0.0003588148101698607
+  }
+}

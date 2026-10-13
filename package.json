@@ -11,7 +11,10 @@
     "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts && node --test tests/spotify-connect.test.mjs",
     "test:music": "playwright test",
     "test:projects": "playwright test --config playwright.projects.config.ts",
-    "test:github": "NODE_OPTIONS=--conditions=react-server tsx --test tests/github.test.ts"
+    "test:github": "NODE_OPTIONS=--conditions=react-server tsx --test tests/github.test.ts",
+    "models:prepare": "node scripts/prepare-models.mjs",
+    "models:benchmark": "node scripts/benchmark-models.mjs",
+    "test:models": "node --experimental-strip-types --test tests/model-assets.test.mjs"
   },
   "dependencies": {
     "@next/env": "^15.1.7",
@@ -75,6 +78,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "^15.2.2",
+    "meshoptimizer": "^1.3.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.23.15",
