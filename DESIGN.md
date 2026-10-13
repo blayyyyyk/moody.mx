@@ -22,7 +22,7 @@ colors:
   glitch-cyan: "#6df3ff"
 typography:
   mono:
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+    fontFamily: '"JetBrains Mono", ui-monospace, monospace'
   hero:
     fontSize: 200px
     fontWeight: 600
@@ -179,7 +179,7 @@ The inspected CSS gives `card` and `popover` the same values as `background`, an
 
 ## Typography
 
-**Confirmed intent:** system monospace is the main typographic voice. Its precision connects the research and technical metadata to the procedural graphics. Keep the contrast between oversized section labels and dense information.
+**Confirmed intent:** JetBrains Mono is the main typographic voice, including the ASCII landscape. Its precision connects the research and technical metadata to the procedural graphics. Keep the contrast between oversized section labels and dense information.
 
 The frontmatter's size roles inherit `typography.mono` on the main page. They describe observed roles rather than new CSS variable names.
 
@@ -339,7 +339,7 @@ The wireframe book beside Publications and GPU alongside Timeline retain substan
 ### Don't
 
 - **Don't** replace the protected signature features or drawer/carousel exploration model without Blake's approval.
-- **Don't** let generic component-library rounding or a new global font override the site's square-edged, monospace character.
+- **Don't** let generic component-library rounding or a font other than JetBrains Mono override the site's square-edged, monospace character.
 - **Don't** remove graphic breathing room merely to make information density uniform across every panel.
 - **Don't** replicate mobile clipping, inaccessible controls, invalid metadata, or sans-serif photo metadata as if they were approved design rules.
 - **Don't** apply stylistic filters to detail photographs or make a crop the only accessible version of an image.

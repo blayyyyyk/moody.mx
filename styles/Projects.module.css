@@ -1,4 +1,4 @@
-.explorer { margin: 12px; color: hsl(var(--primary)); background: hsl(var(--secondary)); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.explorer { margin: 12px; color: hsl(var(--primary)); background: hsl(var(--secondary)); font-family: var(--font-jetbrains-mono), ui-monospace, monospace; }
 .explorer *, .drawer * { min-width: 0; }
 .explorer ::selection, .drawer ::selection { background: hsl(var(--primary)); color: hsl(var(--secondary)); }
 .contributions, .repositories, .activity { border: 1px solid hsl(var(--primary)); }
@@ -60,7 +60,7 @@
 .event p { font-size: 12px; line-height: 1.6; margin-top: 8px; text-align: left; overflow-wrap: anywhere; }
 .activityLink { padding: 12px; min-height: 44px; border-top: 1px solid hsl(var(--primary)); width: 100%; font-size: 12px; }
 .empty { display: flex; align-items: start; flex-direction: column; gap: 16px; padding: 24px 12px; font-size: 14px; line-height: 1.6; }
-.drawer[data-slot="drawer-content"] { height: 80dvh; max-height: 80dvh; border-radius: 0; border-top: 1px solid hsl(var(--primary)); background: hsl(var(--secondary)); color: hsl(var(--primary)); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.drawer[data-slot="drawer-content"] { height: 80dvh; max-height: 80dvh; border-radius: 0; border-top: 1px solid hsl(var(--primary)); background: hsl(var(--secondary)); color: hsl(var(--primary)); font-family: var(--font-jetbrains-mono), ui-monospace, monospace; }
 .drawer > div:first-child { border-radius: 0; height: 4px; background: hsl(var(--primary)); margin-top: 8px; }
 .drawerHeader { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 16px 12px; flex-shrink: 0; }
 .drawerTitle[data-slot] { display: block; margin: 0; padding: 0; font-size: clamp(20px, 3vw, 32px); line-height: 1.2; font-weight: 300; color: inherit; overflow-wrap: anywhere; }
