@@ -2,10 +2,11 @@
 import ThemeToggle from './themeToggle';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import type { ReactNode } from "react";
 
-function NavigationItem({ href, children }: { href: string, children: any }) {
+function NavigationItem({ href, children, className = "" }: { href: string, children: ReactNode, className?: string }) {
     return (
-        <Button className="bg-secondary" variant="default" asChild>
+        <Button className={`bg-secondary ${className}`} variant="default" asChild>
             <Link href={href}>{ children }</Link>
         </Button>
     )
@@ -19,9 +20,11 @@ export default function NavigationMenu() {
             <NavigationItem href="#publications">Publications</NavigationItem>
             <NavigationItem href="#projects">Projects</NavigationItem>
             <NavigationItem href="#music">Music</NavigationItem>
-            <NavigationItem href="#photos">Photos</NavigationItem>
-            <div className="bg-secondary col-span-3 md:col-span-1">
-                <ThemeToggle />
+            <div className="flex min-w-0 bg-secondary md:contents">
+                <NavigationItem href="#photos" className="min-w-0 flex-1 md:flex-none">Photos</NavigationItem>
+                <div className="w-11 shrink-0 border-l border-primary md:w-auto md:border-0">
+                    <ThemeToggle />
+                </div>
             </div>
         </div>
     )
