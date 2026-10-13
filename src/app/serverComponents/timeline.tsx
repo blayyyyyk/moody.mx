@@ -15,7 +15,8 @@ export async function getSheetsData(table: string, range: string) {
 
         const response = await fetch(endpoint, { next: { revalidate: 60 } });
 
-        let data = await response.json().then((data) => data.values);
+        if (!response.ok) return [];
+        let data = await response.json().then((data) => data.values ?? []);
 
         // Return the list of files in JSON format
         return data;
@@ -37,17 +38,12 @@ export function reshapeSheet(fieldData: any[][], fields: string[]) {
 }
 
 export default async function Timeline() {
-    // Course data
-    const courseFields = await getSheetFields("Courses");
-    const courses = await getSheetsData("Courses", "A2:G").then((fieldData) =>
-        reshapeSheet(fieldData, courseFields),
-    );
-
-    // Program data
-    const programFields = await getSheetFields("Programs");
-    const programData = await getSheetsData("Programs", "A2:F").then(
-        (programData) => reshapeSheet(programData, programFields),
-    );
+    const [courseFields, courseRows, programFields, programRows] = await Promise.all([
+        getSheetFields("Courses"), getSheetsData("Courses", "A2:G"),
+        getSheetFields("Programs"), getSheetsData("Programs", "A2:F"),
+    ]);
+    const courses = reshapeSheet(courseRows, courseFields);
+    const programData = reshapeSheet(programRows, programFields);
 
     // Coallesce and filter
     const programs = programData.map((entry: any) => ({

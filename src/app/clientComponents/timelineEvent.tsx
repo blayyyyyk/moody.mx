@@ -278,7 +278,7 @@ export default function TimelineClient({ programs }: { programs: Program[] }) {
                 onMouseLeave={() => setMeshFocused(false)}
             >
                 <HeavenlyMesh
-                    meshPath="/RTX_3080_FE.stl"
+                    model="RTX_3080_FE"
                     focus={meshFocused}
                     scale={3}
                 />

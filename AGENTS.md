@@ -25,3 +25,12 @@ For initial authorization or revoked credentials:
 Queue writes require an active Spotify player on Blake's Premium account. Verify queue behavior with the mocked tests rather than adding real songs. Browser fixtures are synthetic, not evidence of a live connection.
 
 Keep `.env.local` as the local environment source: pull Vercel values through a temporary file and merge private local overrides so an environment pull cannot erase a freshly authorized token. Existing GitHub/Google credentials supply the other portfolio sections.
+
+## Performance
+
+- Runtime wireframe assets are generated from the original STLs with `npm run models:prepare`. Preserve those source assets. The generator simplifies the solid mesh while retaining original sharp outlines; `public/models/manifest.json` records source hashes and error bounds.
+- Keep STL parsing, vertex welding, and edge generation offline. Runtime decoding creates typed-array views into the downloaded buffer without reconstructing geometry.
+- Mount model renderers near the viewport and pause offscreen, hidden-tab, and reduced-motion animation. Verify first load and first scroll so deferred loading does not just postpone a stall.
+- The ASCII hero stays alive while visible: full motion normally, slow drift without pointer distortion under reduced motion. Pause it offscreen and in hidden tabs, resuming without a time jump.
+- Measure production builds on a consistent browser/device setup. `perf:measure` reports local lab measurements, not real-user guarantees. Preserve the initial identity/links, ASCII landscape, and model appearance while optimizing.
+- `npm run test:performance` and `npm run perf:measure` build against synthetic GitHub/Google fixtures in `.next-performance`, so book, GPU, and photo coverage cannot disappear with missing credentials or contaminate a production build. `perf:measure` enforces the checked-in local budgets; set `PERF_ASSERT=0` only for exploratory measurements.

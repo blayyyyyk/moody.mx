@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "./clientComponents/themeProvider";
@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import NavigationMenu from "./clientComponents/navigationMenu";
 
 const inter = Inter({ subsets: ["latin"] });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
 
 export const metadata: Metadata = {
   title: "moody.mx",
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" style={{ "--font-jetbrains-mono": jetbrainsMono.style.fontFamily } as React.CSSProperties} suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"

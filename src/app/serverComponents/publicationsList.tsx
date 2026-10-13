@@ -57,9 +57,8 @@ function PublicationTags({ publication, className = "" }: { publication: Publica
 }
 
 export default async function PublicationsList() {
-    const articlesFields = await getSheetFields("Publications");
-    const articles = await getSheetsData("Publications", "A2:F")
-        .then(articles => reshapeSheet(articles, articlesFields)) as PublicationEntryI[];
+    const [articlesFields, rows] = await Promise.all([getSheetFields("Publications"), getSheetsData("Publications", "A2:F")]);
+    const articles = reshapeSheet(rows, articlesFields) as PublicationEntryI[];
     
     return (
         <Publications>

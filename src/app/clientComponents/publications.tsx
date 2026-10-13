@@ -27,7 +27,7 @@ export default function Publications({ children }: {children: any}) {
                 </div>
 
                 <div className="w-full h-full col-span-1 border-1 border-primary relative bg-secondary"  onMouseEnter={() => setFocus(true)} onMouseLeave={() => setFocus(false)}>
-                    <HeavenlyMesh meshPath="/simplify_Enchiridion_.stl" focus={focus} />
+                    <HeavenlyMesh model="simplify_Enchiridion_" focus={focus} />
                     
                 </div>
             </div>

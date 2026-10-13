@@ -11,6 +11,15 @@ import AboutMe from "./clientComponents/about";
 import NavigationMenu from "./clientComponents/navigationMenu";
 import Footer from "./clientComponents/footer";
 import Music from "./clientComponents/music";
+import { Suspense } from "react";
+import Heading from "./clientComponents/heading";
+
+function SectionLoading({ title }: { title: string }) {
+    return <div className="mx-3 mb-3" aria-busy="true">
+        <Heading className="border border-primary p-3">{title}</Heading>
+        <div className="mt-3 min-h-[50vh] border border-primary p-3 text-sm text-muted-foreground" role="status">Loading {title.toLowerCase()}…</div>
+    </div>;
+}
 
 export default function Home() {
     return (
@@ -20,11 +29,11 @@ export default function Home() {
             <Profile />
             <NavigationMenu />
             <AboutMe />
-            <PublicationsList />
-            <Timeline />
-            <Projects />
+            <Suspense fallback={<SectionLoading title="Publications" />}><PublicationsList /></Suspense>
+            <Suspense fallback={<SectionLoading title="Timeline" />}><Timeline /></Suspense>
+            <Suspense fallback={<SectionLoading title="Projects" />}><Projects /></Suspense>
             <Music />
-            <Photobook />
+            <Suspense fallback={<SectionLoading title="Photos" />}><Photobook /></Suspense>
             <Footer />
         </div>
     );
