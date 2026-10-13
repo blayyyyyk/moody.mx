@@ -1,23 +1,30 @@
 .section { margin: 0 12px 12px; display: flex; flex-direction: column; gap: 12px; }
-.heading { flex-shrink: 0; scroll-margin-top: 120px; }
+.heading { flex-shrink: 0; scroll-margin-top: 90px; }
 .spotifyLogo { width: 0.6em; height: 0.6em; color: #1db954; flex-shrink: 0; position: relative; }
 .grid { display: grid; gap: 12px; min-height: 0; }
 .panel { border: 1px solid hsl(var(--primary)); min-width: 0; min-height: 0; }
 .panelLabel { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid hsl(var(--primary)); font-size: 12px; line-height: 16px; }
-.panelLabel h3 { font-size: 12px; line-height: 16px; padding: 0; margin: 0; width: auto; font-weight: 500; }
-.panelLabel > span { color: hsl(var(--muted-foreground)); white-space: nowrap; }
+.panelLabel h3 { display: flex; flex-direction: row; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; padding: 0; margin: 0; width: auto; font-weight: 500; }
+.panelLabel > span { color: hsl(var(--muted-foreground)); text-align: right; }
 .history { display: flex; flex-direction: column; }
 .searchBar { display: flex; align-items: center; gap: 8px; padding: 0 12px; min-height: 56px; border-bottom: 1px solid hsl(var(--primary)); }
 .searchBar input { width: 100%; min-width: 0; background: transparent; border-radius: 0; font: inherit; font-size: 12px; padding: 16px 0; outline: none; caret-color: hsl(var(--primary)); }
 .searchBar input::placeholder { color: hsl(var(--muted-foreground)); opacity: 1; }
 .searchBar:focus-within { outline: 2px solid hsl(var(--ring)); outline-offset: -3px; }
 .searchBar input:disabled { cursor: not-allowed; }
-.trackScroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: hsl(var(--primary)) hsl(var(--secondary)); max-height: 480px; flex: 1; }
+.trackViewport { position: relative; display: flex; flex: 1; min-height: 0; }
+.trackScroll { overflow-y: auto; scrollbar-width: none; max-height: 480px; flex: 1; min-width: 0; overscroll-behavior-y: contain; }
+.trackScroll::-webkit-scrollbar { display: none; }
+.scrollArrow { position: absolute; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; display: grid; place-items: center; background: hsl(var(--secondary)); border: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); border-radius: 0; z-index: 1; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out; }
+.scrollArrow[data-visible="true"] { opacity: 1; pointer-events: auto; }
+.scrollArrow:hover { background: hsl(var(--primary)); color: hsl(var(--secondary)); }
+.scrollUp { top: 12px; }
+.scrollDown { bottom: 12px; }
 .trackList { list-style: none; margin: 0; padding: 0; }
-.trackRow { display: flex; align-items: center; border-bottom: 1px solid hsl(var(--primary) / 0.25); padding-right: 4px; }
+.trackRow { display: flex; align-items: center; border-bottom: 1px solid hsl(var(--primary)); padding-right: 4px; }
 .trackLink { display: grid; grid-template-columns: 40px minmax(0, 1.2fr) minmax(0, 0.8fr) 36px; align-items: center; gap: 8px; min-width: 0; flex: 1; padding: 10px 8px; text-decoration: none; color: inherit; }
 .trackLink:hover { background: hsl(var(--primary)); color: hsl(var(--secondary)); }
-.trackArt { width: 40px; height: 40px; object-fit: contain; }
+.trackArt { width: 40px; height: 40px; object-fit: cover; border: 1px solid hsl(var(--primary)); }
 .trackTitle, .trackArtist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 18px; }
 .trackArtist { opacity: 0.75; }
 .duration { font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
@@ -26,10 +33,12 @@
 .iconButton:disabled { opacity: 0.5; cursor: not-allowed; }
 .section a:focus-visible, .section button:focus-visible, .trackScroll:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -3px; }
 .historyFooter { border-top: 1px solid hsl(var(--primary)); padding: 10px 12px; font-size: 12px; line-height: 18px; min-height: 39px; }
+.allowance { display: block; margin-bottom: 4px; }
 .empty { padding: 24px 12px; font-size: 14px; line-height: 21px; color: hsl(var(--muted-foreground)); }
 .favorite { display: flex; flex-direction: column; }
 .favoriteLink { display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 0; flex: 1; padding: 12px; text-align: center; color: inherit; text-decoration: none; }
-.favoriteArt { display: block; width: min(100%, 240px); aspect-ratio: 1; object-fit: contain; min-height: 0; }
+.favoriteArtFrame { width: min(100%, 240px); aspect-ratio: 1; display: grid; place-items: center; min-height: 0; }
+.favoriteArt { display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid hsl(var(--primary)); }
 .favoriteCopy { flex-shrink: 0; width: 100%; }
 .favoriteCopy h4 { font-size: 16px; font-weight: 500; line-height: 22px; margin: 0; }
 .favoriteCopy p { font-size: 12px; line-height: 18px; color: hsl(var(--muted-foreground)); text-align: center; margin: 2px 0 0; }
@@ -37,11 +46,10 @@
 .favoriteEmpty { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; padding: 24px; min-height: 230px; }
 .favoriteEmpty p { max-width: 28ch; font-size: 12px; line-height: 18px; text-align: center; color: hsl(var(--muted-foreground)); }
 .artPlaceholder { display: flex; align-items: center; justify-content: center; color: hsl(var(--muted-foreground)); background: hsl(var(--primary) / 0.04); }
-.emptyCover { width: 88px; height: 88px; border: 1px solid hsl(var(--primary) / 0.25); }
-.sculpture { display: flex; flex-direction: column; }
-.model { flex: none; height: 360px; min-height: 0; }
-.modelLoading { display: grid; place-items: center; height: 100%; font-size: 12px; }
-.nowPlaying { padding: 16px 12px; border-top: 1px solid hsl(var(--primary)); }
+.emptyCover { width: 88px; height: 88px; border: 1px solid hsl(var(--primary)); }
+.sculpture { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.model { display: flex; align-items: center; flex: none; min-height: 0; }
+.nowPlaying { padding: 16px 12px; border: 1px solid hsl(var(--primary)); }
 .nowLabel { display: block; font-size: 12px; color: hsl(var(--muted-foreground)); margin-bottom: 8px; }
 .nowPlaying > a:not(.spotifyCredit) { display: flex; flex-direction: column; gap: 4px; color: inherit; }
 .nowPlaying strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
@@ -61,15 +69,20 @@
     .history { grid-column: 1; grid-row: 1 / 3; }
     .topTrack { grid-column: 2; grid-row: 1; }
     .topArtist { grid-column: 2; grid-row: 2; }
-    .sculpture { grid-column: 3; grid-row: 1 / 3; }
+    .sculpture { grid-column: 3; grid-row: 1 / 3; container-type: size; align-items: center; }
+    /* Reserve bounded space for playback metadata, then fit both the drawing
+       and its info panel to the remaining height without losing their alignment. */
+    .sculpture > * { width: min(100cqw, calc((100cqh - 180px) * 1200 / 1040)); }
+    .nowPlaying { max-height: 180px; overflow-y: auto; flex-shrink: 0; }
     .trackScroll { max-height: none; }
     .favoriteLink { gap: 8px; overflow-y: auto; }
-    .favoriteArt { flex: 1; width: 100%; height: 0; }
+    .favoriteArtFrame { flex: 1; width: 100%; min-height: 0; container-type: size; }
+    .favoriteArt { width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); }
     .favoriteEmpty { min-height: 0; padding: 12px; }
     .emptyCover { width: 64px; height: 64px; flex-shrink: 0; }
     .model { flex: 1; height: auto; min-height: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .heading span, .spinner { animation: none !important; }
-    .heading span[aria-hidden="true"] { display: none; }
+    .spinner { animation: none; }
+    .scrollArrow { transition: none; }
 }
