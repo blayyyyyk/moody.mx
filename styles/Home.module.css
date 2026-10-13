@@ -234,4 +234,6 @@
     opacity: 0;
   }
 }
-
+.sectionHeading {
+    flex-direction: row;
+}
