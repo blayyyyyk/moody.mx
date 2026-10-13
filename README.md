@@ -22,6 +22,23 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Learn More
 
+### Projects checks
+
+Run `npm run test:projects`. Playwright starts a dedicated
+development server on port 3102 with synthetic GitHub responses; no GitHub token
+or external account is required. Install Chromium with `npx playwright install chromium`
+if it is not already available. To check an existing server against its configured
+data instead, set `PROJECTS_TEST_URL` to its URL.
+
+Run `npm run test:github` for mocked server checks covering pagination, public
+repository selection, partial upstream failures, and README access restrictions.
+
+The production Projects section uses the server-only `GITHUB_API_KEY` for its
+contribution calendar. Public repositories and activity also work without a token,
+subject to GitHub's unauthenticated rate limit. Only Blake's public, owned, starred
+repositories are exposed. Repository/activity/README fetches are cached for 15 minutes;
+the contribution calendar is cached for one hour.
+
 To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
