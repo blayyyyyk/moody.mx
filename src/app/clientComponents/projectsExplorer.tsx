@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, ChevronDown, ChevronUp, GitCommitHorizontal, Star, X } from "lucide-react";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -143,9 +143,9 @@ function ProjectRow({ project }: { project: GitHubProject }) {
   </li>;
 }
 
-function ProjectList({ projects }: { projects: GitHubProject[] }) {
+function ScrollList({ children, label, subject }: { children: ReactNode; label: string; subject: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLUListElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ above: false, below: false });
   const updateEdges = useCallback(() => {
     const node = scrollRef.current;
@@ -163,28 +163,28 @@ function ProjectList({ projects }: { projects: GitHubProject[] }) {
     return () => observer.disconnect();
   }, [updateEdges]);
 
-  function scrollProjects(direction: -1 | 1) {
+  function scrollList(direction: -1 | 1) {
     const node = scrollRef.current;
     if (!node) return;
     node.scrollBy({ top: direction * node.clientHeight * 0.75, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   }
 
-  return <div className={styles.projectViewport}>
-    <div ref={scrollRef} className={styles.projectScroll} onScroll={updateEdges} tabIndex={0} role="region" aria-label="Starred project list"
+  return <div className={styles.listViewport}>
+    <div ref={scrollRef} className={styles.listScroll} onScroll={updateEdges} tabIndex={0} role="region" aria-label={label}
       onKeyDown={event => {
         if (event.target !== event.currentTarget) return;
         if (event.key === "PageDown" || event.key === "PageUp") {
           event.preventDefault();
-          scrollProjects(event.key === "PageDown" ? 1 : -1);
+          scrollList(event.key === "PageDown" ? 1 : -1);
         } else if (event.key === "Home" || event.key === "End") {
           event.preventDefault();
           event.currentTarget.scrollTo({ top: event.key === "Home" ? 0 : event.currentTarget.scrollHeight });
         }
       }}>
-      <ul ref={contentRef} className={styles.list}>{projects.map(project => <ProjectRow key={project.fullName} project={project} />)}</ul>
+      <div ref={contentRef}>{children}</div>
     </div>
-    <button type="button" className={`${styles.scrollArrow} ${styles.scrollUp}`} data-visible={edges.above} disabled={!edges.above} aria-hidden={!edges.above} aria-label="Scroll projects up" onClick={() => scrollProjects(-1)}><ChevronUp size={20} aria-hidden="true" /></button>
-    <button type="button" className={`${styles.scrollArrow} ${styles.scrollDown}`} data-visible={edges.below} disabled={!edges.below} aria-hidden={!edges.below} aria-label="Scroll projects down" onClick={() => scrollProjects(1)}><ChevronDown size={20} aria-hidden="true" /></button>
+    <button type="button" className={`${styles.scrollArrow} ${styles.scrollUp}`} data-visible={edges.above} disabled={!edges.above} aria-hidden={!edges.above} aria-label={`Scroll ${subject} up`} onClick={() => scrollList(-1)}><ChevronUp size={20} aria-hidden="true" /></button>
+    <button type="button" className={`${styles.scrollArrow} ${styles.scrollDown}`} data-visible={edges.below} disabled={!edges.below} aria-hidden={!edges.below} aria-label={`Scroll ${subject} down`} onClick={() => scrollList(1)}><ChevronDown size={20} aria-hidden="true" /></button>
   </div>;
 }
 
@@ -194,15 +194,19 @@ export default function ProjectsExplorer({ data }: { data: ProjectsData }) {
     <div className={styles.columns}>
       <div className={styles.repositories}>
         <div className={styles.bar}><h2><Star size={16} aria-hidden="true" /> Starred projects</h2><span>{data.projects.length.toString().padStart(2, "0")} repositories</span></div>
-        {data.projects.length ? <ProjectList projects={data.projects} /> : <div className={styles.empty}>{data.projectsUnavailable ? "Projects couldn’t be loaded right now." : "No starred projects to show yet."}<a href={`${profile}?tab=repositories`}>Browse repositories on GitHub <ArrowUpRight size={14} /></a></div>}
+        <ScrollList label="Starred project list" subject="projects">
+          {data.projects.length ? <ul className={styles.list}>{data.projects.map(project => <ProjectRow key={project.fullName} project={project} />)}</ul> : <div className={styles.empty}>{data.projectsUnavailable ? "Projects couldn’t be loaded right now." : "No starred projects to show yet."}<a href={`${profile}?tab=repositories`}>Browse repositories on GitHub <ArrowUpRight size={14} /></a></div>}
+        </ScrollList>
       </div>
       <aside className={styles.activity} aria-label="Recent GitHub activity">
         <div className={styles.bar}><h2><GitCommitHorizontal size={16} aria-hidden="true" /> Recent activity</h2><span>Public</span></div>
+        <ScrollList label="Recent activity list" subject="activity">
         {data.activity.length ? <ol className={styles.list}>{data.activity.map(event => <li className={styles.event} key={event.id}>
           <div className={styles.eventHeading}><span>{event.action}</span><time dateTime={event.date}>{dateLabel(event.date)}</time></div>
           <a href={event.url} target="_blank" rel="noreferrer">{event.repo}<ArrowUpRight size={14} /></a>
           {event.detail && <p>{event.detail}</p>}
         </li>)}</ol> : <div className={styles.empty}>{data.activityUnavailable ? "Activity couldn’t be loaded right now." : "No recent public activity."}</div>}
+        </ScrollList>
         <a className={styles.activityLink} href={profile} target="_blank" rel="noreferrer">Explore on GitHub <ArrowUpRight size={16} /></a>
       </aside>
     </div>

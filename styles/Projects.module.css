@@ -25,12 +25,14 @@
 .datePicker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .datePicker input { min-height: 44px; border: 1px solid hsl(var(--primary)); padding: 8px; border-radius: 0; background: hsl(var(--secondary)); color: hsl(var(--primary)); font: inherit; }
 .legend i { width: 11px; height: 11px; border: 1px solid color-mix(in srgb, hsl(var(--primary)) 20%, transparent); }
-.columns { display: grid; gap: 12px; margin-top: 12px; align-items: start; }
+.columns { display: grid; gap: 12px; margin-top: 12px; }
+.repositories, .activity { display: flex; flex-direction: column; min-height: 0; }
+.repositories > .bar, .activity > .bar, .activityLink { flex-shrink: 0; }
 .list { list-style: none; padding: 0; margin: 0; }
-.projectViewport { position: relative; display: flex; min-height: 0; }
-.projectScroll { flex: 1; min-width: 0; max-height: 480px; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
-.projectScroll::-webkit-scrollbar { display: none; }
-.projectScroll:focus-visible { outline-offset: -3px; }
+.listViewport { position: relative; display: flex; flex: 1; min-height: 0; }
+.listScroll { flex: 1; min-width: 0; max-height: 480px; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
+.listScroll::-webkit-scrollbar { display: none; }
+.explorer .listScroll:focus-visible { outline-offset: -3px; }
 .scrollArrow { position: absolute; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; display: grid; place-items: center; background: hsl(var(--secondary)); border: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); border-radius: 0; z-index: 1; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out; }
 .scrollArrow[data-visible="true"] { opacity: 1; pointer-events: auto; }
 .scrollArrow:hover { background: hsl(var(--primary)); color: hsl(var(--secondary)); }
@@ -84,6 +86,6 @@
 .markdown :global(.hljs-keyword), .markdown :global(.hljs-selector-tag) { font-weight: 700; }
 .markdown :global(.hljs-comment) { color: hsl(var(--muted-foreground)); }
 @media (min-width: 640px) { .project { padding: 20px 16px 0; } .projectFooter { margin-inline: -16px; padding-left: 16px; } .drawerHeader, .drawerBar { padding-inline: 24px; } .markdown { padding-inline: 24px; } }
-@media (min-width: 768px) { .columns { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
-@media (min-width: 1024px) { .columns { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } .chartScroll { padding: 20px 16px 8px; } .projectScroll { max-height: 640px; } }
+@media (min-width: 768px) { .columns { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } .repositories, .activity { height: 528px; } .listScroll { max-height: none; } }
+@media (min-width: 1024px) { .columns { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } .chartScroll { padding: 20px 16px 8px; } .repositories, .activity { height: 688px; } }
 @media (prefers-reduced-motion: reduce) { .drawer { animation: none !important; transition: none !important; } .scrollArrow { transition: none; } }

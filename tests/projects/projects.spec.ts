@@ -13,6 +13,19 @@ test("projects fit every responsive boundary in both themes", async ({ browser, 
       await expect(section.locator("button[data-date][tabindex='0']")).toHaveCount(1);
       await expect(section.locator("button[data-level='4']").first()).toHaveCSS("background-color", theme === "dark" ? "rgb(215, 38, 255)" : "rgb(14, 227, 128)");
       await expect(section.getByRole("region", { name: "Starred project list" })).toHaveCSS("scrollbar-width", "none");
+      await expect(section.getByRole("region", { name: "Recent activity list" })).toHaveCSS("scrollbar-width", "none");
+      const alignment = await section.evaluate(element => {
+        const projects = element.querySelector("[class*=repositories]")!.getBoundingClientRect();
+        const activity = element.querySelector("aside")!.getBoundingClientRect();
+        const columns = element.querySelector("[class*=columns]")!.getBoundingClientRect();
+        const nextHeading = document.querySelector("span#photos")!.getBoundingClientRect();
+        return { top: Math.abs(projects.top - activity.top), bottom: Math.abs(projects.bottom - activity.bottom), gap: nextHeading.top - columns.bottom };
+      });
+      if (width >= 768) {
+        expect(alignment.top).toBeLessThan(1);
+        expect(alignment.bottom).toBeLessThan(1);
+      }
+      expect(alignment.gap).toBe(12);
       const dividerInsets = await section.locator("li[class*=project]").first().evaluate(row => {
         const card = row.getBoundingClientRect();
         const footer = row.querySelector("[class*=projectFooter]")!.getBoundingClientRect();
@@ -39,13 +52,13 @@ test("projects fit every responsive boundary in both themes", async ({ browser, 
   }
 });
 
-for (const width of [320, 1440]) test(`project list arrows follow scroll boundaries at ${width}px`, async ({ page }) => {
+for (const subject of ["projects", "activity"]) for (const width of [320, 1440]) test(`${subject} list arrows follow scroll boundaries at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  const list = page.getByRole("region", { name: "Starred project list" });
-  const down = page.getByRole("button", { name: "Scroll projects down", includeHidden: true });
-  const up = page.getByRole("button", { name: "Scroll projects up", includeHidden: true });
+  const list = page.getByRole("region", { name: subject === "projects" ? "Starred project list" : "Recent activity list" });
+  const down = page.getByRole("button", { name: `Scroll ${subject} down`, includeHidden: true });
+  const up = page.getByRole("button", { name: `Scroll ${subject} up`, includeHidden: true });
   await expect(up).toBeDisabled();
   await expect(down).toBeEnabled();
   await down.click();
