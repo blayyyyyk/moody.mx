@@ -13,6 +13,7 @@ import Footer from "./clientComponents/footer";
 import Music from "./clientComponents/music";
 import { Suspense } from "react";
 import Heading from "./clientComponents/heading";
+import MangaAnime from "./clientComponents/mangaAnime";
 
 function SectionLoading({ title }: { title: string }) {
     return <div className="mx-3 mb-3" aria-busy="true">
@@ -33,6 +34,7 @@ export default function Home() {
             <Suspense fallback={<SectionLoading title="Timeline" />}><Timeline /></Suspense>
             <Suspense fallback={<SectionLoading title="Projects" />}><Projects /></Suspense>
             <Music />
+            <MangaAnime />
             <Suspense fallback={<SectionLoading title="Photos" />}><Photobook /></Suspense>
             <Footer />
         </div>

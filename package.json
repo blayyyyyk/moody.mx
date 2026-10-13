@@ -16,7 +16,10 @@
     "models:benchmark": "node scripts/benchmark-models.mjs",
     "perf:measure": "node scripts/run-performance.mjs",
     "test:models": "node --experimental-strip-types --test tests/model-assets.test.mjs",
-    "test:performance": "playwright test tests/browser/performance.spec.ts --config playwright.performance.config.ts"
+    "test:performance": "playwright test tests/browser/performance.spec.ts --config playwright.performance.config.ts",
+    "mal:connect": "node scripts/mal-connect.mjs",
+    "test:mal": "NODE_OPTIONS=--conditions=react-server tsx --test tests/mal.test.ts",
+    "test:mal:browser": "playwright test --config playwright.mal.config.ts"
   },
   "dependencies": {
     "@next/env": "^15.1.7",
