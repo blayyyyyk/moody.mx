@@ -234,4 +234,11 @@
     opacity: 0;
   }
 }
+.sectionHeading {
+    flex-direction: row;
+}
 
+@media (prefers-reduced-motion: reduce) {
+    .sectionHeading .title { animation: none; }
+    .sectionHeading > span[aria-hidden="true"] { display: none; }
+}

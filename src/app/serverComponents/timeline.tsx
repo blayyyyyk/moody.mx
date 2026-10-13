@@ -8,6 +8,7 @@ const apiKey = process.env.NEXT_PUBLIC_GCP_API_KEY; // Use your environment vari
 const programColumnName = "Program Name";
 
 export async function getSheetsData(table: string, range: string) {
+    if (!sheetsId || !apiKey) return [];
     try {
         // Google Drive API endpoint to list files within a folder
         const endpoint = `https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/${table}!${range}?key=${apiKey}`;
@@ -24,7 +25,7 @@ export async function getSheetsData(table: string, range: string) {
 }
 
 export async function getSheetFields(table: string) {
-    return getSheetsData(table, "1:1").then((v) => v[0]);
+    return getSheetsData(table, "1:1").then((v) => v[0] ?? []);
 }
 
 export function reshapeSheet(fieldData: any[][], fields: string[]) {
@@ -64,7 +65,7 @@ export default async function Timeline() {
                     Timeline
                 </Heading>
             </div>
-            <TimelineClient programs={programs} />
+            {programs.length > 0 ? <TimelineClient programs={programs} /> : <p className="m-3 border border-primary p-3 text-sm text-muted-foreground">No timeline entries available.</p>}
         </>
     );
 }

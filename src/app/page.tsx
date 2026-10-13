@@ -10,6 +10,7 @@ import PublicationsList from "./serverComponents/publicationsList";
 import AboutMe from "./clientComponents/about";
 import NavigationMenu from "./clientComponents/navigationMenu";
 import Footer from "./clientComponents/footer";
+import Music from "./clientComponents/music";
 
 export default function Home() {
     return (
@@ -22,6 +23,7 @@ export default function Home() {
             <PublicationsList />
             <Timeline />
             <Projects />
+            <Music />
             <Photobook />
             <Footer />
         </div>

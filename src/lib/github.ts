@@ -11,6 +11,7 @@ const octokit = new Octokit({
 // 2. Fetch README contents in the same query  
 // CACHED on server for X seconds
 export const getProjects = cache(async () => {
+  if (!process.env.GITHUB_API_KEY) return [];
   const query = `
     query($username: String!) {
       user(login: $username) {

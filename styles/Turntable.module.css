@@ -1,0 +1,37 @@
+.turntable {
+    display: block;
+    width: 100%;
+    height: auto;
+    flex: none;
+    color: hsl(var(--primary));
+}
+
+.surface {
+    fill: hsl(var(--secondary));
+}
+
+.vinyl {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: record-spin 8s linear infinite;
+    will-change: transform;
+}
+
+.tonearm {
+    transform-origin: 0 0;
+    transform: rotate(0deg);
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tonearm[data-position="playing"] {
+    transform: rotate(23deg);
+}
+
+@keyframes record-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vinyl { animation: none; }
+    .tonearm { transition: none; }
+}

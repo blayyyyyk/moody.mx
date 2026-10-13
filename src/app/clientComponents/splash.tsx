@@ -1,8 +1,6 @@
-import styles from '../styles/Home.module.css'
 import Background from './background';
 import Heading from './heading';
 
-import PROFILE_BG from '../public/profile-cropped.jpg';
 import "../../../styles/globals.css";
 
 import Banner from './banner';
