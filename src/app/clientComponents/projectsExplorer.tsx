@@ -128,7 +128,7 @@ function ProjectRow({ project }: { project: GitHubProject }) {
     <div className={styles.tags}>{project.language && <span>{project.language}</span>}{project.topics.slice(0, 5).map(topic => <span key={topic}>{topic}</span>)}</div>
     <div className={styles.projectFooter}>
       <span>Updated <time dateTime={project.pushedAt}>{dateLabel(project.pushedAt)}</time></span>
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer autoFocus open={open} onOpenChange={setOpen}>
         <DrawerTrigger className={styles.control} aria-label={`Read README for ${project.name}`}>Read README <ArrowUpRight size={16} /></DrawerTrigger>
         <DrawerContent className={styles.drawer}>
           <div className={styles.drawerHeader}>

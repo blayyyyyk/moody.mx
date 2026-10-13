@@ -94,10 +94,16 @@ for (const width of [320, 390, 768, 1440]) test(`README supports markdown, retry
     },
   }));
   await page.route("https://raw.githubusercontent.com/**", route => route.abort());
+  await expect(page.getByRole("button", { name: "Scroll projects down" })).toBeEnabled();
   await trigger.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toHaveCSS("background-color", "rgb(31, 31, 31)");
+  await expect(dialog.getByRole("button", { name: "Close README" })).toBeFocused();
   await expect(dialog.getByText("The README couldn’t be loaded.")).toBeVisible();
+  for (let step = 0; step < 6; step++) {
+    await page.keyboard.press("Tab");
+    expect(await dialog.evaluate(element => element.contains(document.activeElement))).toBe(true);
+  }
   fail = false;
   await dialog.getByRole("button", { name: "Try again" }).click();
   await expect(dialog.getByRole("heading", { name: "Example README" })).toBeVisible();
