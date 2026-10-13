@@ -66,7 +66,7 @@ test("model download failures can be retried", async ({ page }) => {
     await expect(book.locator("[data-model-ready]")).toBeVisible();
 });
 
-test("photo camera stays deferred until its drawer opens", async ({ page }) => {
+test("photo illustrations and dense drawer do not load the source 3D model", async ({ page }) => {
     const glbs: string[] = [];
     page.on("request", (request) => { if (request.url().endsWith(".glb")) glbs.push(request.url()); });
     await page.goto("/");
@@ -74,8 +74,10 @@ test("photo camera stays deferred until its drawer opens", async ({ page }) => {
     await page.getByText("view photo details", { exact: true }).first().click();
     const photo = page.getByRole("dialog");
     await expect(photo).toBeVisible();
-    await expect(photo.locator("canvas")).toBeVisible();
-    await expect.poll(() => glbs.length).toBe(1);
+    await expect(photo.getByRole("img")).toBeVisible();
+    await expect(photo.getByRole("complementary", { name: "Photo metadata" })).toBeVisible();
+    await expect(photo.locator("canvas")).toHaveCount(0);
+    expect(glbs).toHaveLength(0);
     await page.keyboard.press("Escape");
     await expect(photo).toHaveCount(0);
 });

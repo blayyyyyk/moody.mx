@@ -40,3 +40,10 @@ yarn-error.log*
 next-env.d.ts
 # design review artifacts
 /.impeccable/review/
+
+# Disposable model-tracing experiment output
+/public/prototype-camera-traces/
+
+# Rebuilt locally from pinned dependencies by predev/prebuild
+/public/photo-tools/
+/.next-photos/

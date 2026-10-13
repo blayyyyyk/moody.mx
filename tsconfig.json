@@ -31,6 +31,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-performance/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
     "src/app/api/files/json/courses/fields/route.js",
@@ -38,7 +39,7 @@
     "src/app/api/files/resume/route.js",
     "src/app/api/projects/route.js",
     "src/app/serverComponents/fetchGithubData.ts",
-    ".next-performance/types/**/*.ts"
+    ".next-photos/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

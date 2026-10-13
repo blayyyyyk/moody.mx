@@ -1,27 +1,20 @@
 "use client"
 
 import { Photo, ImageMediaMetadata } from "@/lib/types";
-import { ReactNode, Suspense, useEffect, useState, useRef } from 'react';
-import dynamic from 'next/dynamic';
+import { photoDescription, photoDimensions } from "@/lib/photos";
+import { useState, useRef } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
-import plusJakartaSans from '../../../styles/fonts';
 import Image from 'next/image';
-import React from 'react';
-import { Dialog } from "radix-ui";
 import '../globals.css';
+import styles from '../../../styles/PhotoDetails.module.css';
 import Marquee from "react-fast-marquee";
 import { 
     Calendar,
-    Ruler,
     Camera,
     Aperture,
     Timer,
-    Thermometer,
     Focus,
-    ScanEye,
-    Image as ImageIcon,
-    File,
-    Blend
+    X
  } from "lucide-react";
 
 import {
@@ -29,30 +22,16 @@ import {
     DrawerClose,
     DrawerContent as GenericDrawerContent,
     DrawerDescription,
-    DrawerFooter,
     DrawerTitle,
 } from "@/components/ui/drawer";
 
 import { DrawerTrigger } from "./drawerTrigger";
 
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardDescription } from "@/components/ui/card";
-import { metadata } from "../layout";
 import { Badge } from "@/components/ui/badge";
-const PhotoCameraScene = dynamic(() => import('./photoCameraScene'), { ssr: false });
-
-function LoadingImage() {
-    return (
-        <div className="w-screen max-w-full h-[50vh] flex flex-col gap-3 h-full min-h-[200px] absolute top-0">
-            <Skeleton className="h-full w-full flex-grow rounded-none" />
-            <Skeleton className="h-[40px] w-full flex-grow rounded-none" />
-        </div>
-    )
-}
 
 function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
     return (
-        <div className="font-mono text-xs border-primary absolute bottom-0 bg-secondary max-sm:hidden">
+        <div className="w-full font-mono text-xs border-primary absolute bottom-0 bg-secondary max-sm:hidden">
             <Marquee pauseOnHover className="border-t-1 border-primary flex flex-row items-center">
                 <Badge className="bg-secondary text-primary">
                     <Calendar data-icon="inline-start" className="stroke-primary" />
@@ -60,7 +39,7 @@ function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
                 </Badge>
                 <Badge className="bg-secondary text-primary">
                     <Focus data-icon="inline-start" className="stroke-primary" />
-                    {metadata.date?.replace(":", "/").replace(":", "/") || "?"}
+                    {metadata.focalLength ? `${metadata.focalLength}mm` : "?"}
                 </Badge>
                 <Badge className="bg-secondary text-primary">
                     <Camera data-icon="inline-start" className="stroke-primary" />
@@ -68,11 +47,11 @@ function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
                 </Badge>
                 <Badge className="bg-secondary text-primary">
                     <Aperture data-icon="inline-start" className="stroke-primary" />
-                    {"f/" + metadata.aperture || "?"}
+                    {metadata.aperture ? `f/${metadata.aperture}` : "?"}
                 </Badge>
                 <Badge className="bg-secondary text-primary">
                     <Timer data-icon="inline-start" className="stroke-primary" />
-                    {metadata.exposureTime + "s" || "?"}
+                    {metadata.exposureTime != null ? `${metadata.exposureTime}s` : "?"}
                 </Badge>
                 <Badge className="bg-secondary text-primary">
                     <div className="bg-white border-1 border-black text-black text-[8px] px-1 py-0 ml-3 h-auto flex justify-center items-center text-center font-bold my-auto">ISO</div>
@@ -83,128 +62,163 @@ function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
     )
 }
 
-function MetadataEntry({ title, value, children }: { title: string, value: number | string, children?: ReactNode }) {
-    return (
-        <div className="w-auto flex flex-row p-1 gap-3 items-center justify-center text-primary">
-            {children}
-            {title}
-            {title != "" && <span className="w-[10px] h-[10px] rounded-full bg-primary scale-[50%]"></span>}
-            {value}
-        </div>
-    )
+const unavailable = "Not recorded";
+
+function metadataText(value: unknown): string {
+    return typeof value === "string" && value.trim() && !/^(undefined|null|nan|invalid date)$/i.test(value.trim())
+        ? value.trim() : unavailable;
 }
 
-function PhotoMetadataExpandedView({ metadata }: { metadata: ImageMediaMetadata & { fileSize: number, fileExtension: string } }) {
-    
+function metadataNumber(value: unknown, suffix = "", prefix = "", allowZero = false): string {
+    return typeof value === "number" && Number.isFinite(value) && (allowZero || value > 0)
+        ? `${prefix}${Number(value.toPrecision(6))}${suffix}` : unavailable;
+}
 
-    
+function captureDate(value: unknown): string {
+    const text = metadataText(value).replace(/^(\d{4}):(\d{2}):(\d{2})/, "$1-$2-$3");
+    return Number.isFinite(Date.parse(text)) ? text.replace("T", " ") : unavailable;
+}
+
+function fileSize(value: unknown): string {
+    const bytes = typeof value === "string" && value.trim() ? Number(value) : value;
+    if (typeof bytes !== "number" || !Number.isFinite(bytes) || bytes <= 0) return unavailable;
+    return bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(2)} MB`
+        : bytes >= 1_000 ? `${(bytes / 1_000).toFixed(1)} kB` : `${bytes} B`;
+}
+
+function MetadataGroup({ title, entries }: { title: string; entries: [string, string][] }) {
+    return (
+        <section className={styles.group} aria-label={title}>
+            <h3>{title}</h3>
+            <dl>{entries.map(([label, value]) => (
+                <div className={styles.entry} key={label}>
+                    <dt>{label}</dt><dd>{value}</dd>
+                </div>
+            ))}</dl>
+        </section>
+    );
+}
+
+function PhotoMetadataExpandedView({ photo }: { photo: Photo }) {
+    const metadata = photo.imageMediaMetadata;
+    const exposure = metadata?.exposureTime;
+    const shutter = typeof exposure === "number" && Number.isFinite(1 / exposure) && exposure > 0 && exposure < 1
+        ? `1/${Number((1 / exposure).toPrecision(4))} s` : metadataNumber(exposure, " s");
+    const format = metadataText(photo.fileExtension);
 
     return (
-        <Card className="w-full h-full bg-secondary border-none rounded-none relative">
-            <DrawerTitle className="hidden">
-                Hello
-            </DrawerTitle>
-            <div className="grid grid-rows-2 h-full relative">
-                <CardContent className="flex flex-col text-center lg:items-end text-white bg-transparent font-light">
-                    <MetadataEntry title="" value={ metadata.date?.replace(":", "/").replace(":", "/") || "unknown"}>
-                        <Calendar className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="" value={(metadata.width || "unknown") + " x " + (metadata.height || "unknown")}>
-                        <Focus className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="" value={(metadata.cameraMake || "unknown") + " " + (metadata.cameraModel || "unknown")}>
-                        <Camera className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="aperture" value={"f/" + metadata.aperture || "unknown"}>
-                        <Aperture className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="shutter speed" value={metadata.exposureTime + "s" || "unknown"}>
-                        <Timer className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="" value={metadata.isoSpeed || "unknown"}>
-                        <div className="bg-secondary border-1 border-primary text-primary text-[10px] px-1 flex justify-center items-center text-center font-bold">ISO</div>
-                    </MetadataEntry>
-                    <MetadataEntry title="focal length" value={metadata.focalLength + "mm" || "unknown"}>
-                        <Ruler className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="white balance" value={metadata.whiteBalance || "unknown"}>
-                        <Thermometer className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="exposure mode" value={metadata.exposureMode || "unknown"}>
-                        <ScanEye className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="color space" value={ metadata.colorSpace || "unknown"}>
-                        <Blend className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="file type" value={ metadata.fileExtension || "unknown"}>
-                        <ImageIcon className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                    <MetadataEntry title="size" value={ Math.trunc(metadata.fileSize / 10000) / 100 + "MB" || "unknown"}>
-                        <File className="stroke-primary" width={15} height={15} />
-                    </MetadataEntry>
-                </CardContent>
-                <div className="w-full">
-                    <PhotoCameraScene />
-                </div>
-                
-            </div>
-        </Card>
-    )
+        <aside className={styles.metadata} aria-label="Photo metadata" tabIndex={0}>
+            <MetadataGroup title="Camera / lens" entries={[
+                ["Make", metadataText(metadata?.cameraMake)],
+                ["Camera", metadataText(metadata?.cameraModel)],
+                ["Lens", metadataText(metadata?.lens)],
+            ]} />
+            <MetadataGroup title="Capture settings" entries={[
+                ["Taken", captureDate(metadata?.date)],
+                ["Aperture", metadataNumber(metadata?.aperture, "", "f/")],
+                ["Shutter", shutter],
+                ["ISO", metadataNumber(metadata?.isoSpeed)],
+                ["Focal length", metadataNumber(metadata?.focalLength, " mm")],
+                ["Exposure", metadataText(metadata?.exposureMode)],
+                ["White balance", metadataText(metadata?.whiteBalance)],
+                ...(metadata?.exposureBias != null ? [["Compensation", metadataNumber(metadata.exposureBias, " EV", "", true)] as [string, string]] : []),
+                ...(metadata?.meteringMode ? [["Metering", metadataText(metadata.meteringMode)] as [string, string]] : []),
+                ...(typeof metadata?.flashUsed === "boolean" ? [["Flash", metadata.flashUsed ? "Fired" : "Did not fire"] as [string, string]] : []),
+                ...(metadata?.maxApertureValue != null ? [["Max aperture (APEX)", metadataNumber(metadata.maxApertureValue, "", "", true)] as [string, string]] : []),
+            ]} />
+            <MetadataGroup title="File info" entries={[
+                ["Dimensions", metadataNumber(metadata?.width) !== unavailable && metadataNumber(metadata?.height) !== unavailable
+                    ? `${metadata.width} × ${metadata.height} px` : unavailable],
+                ["Format", format === unavailable ? unavailable : format.toUpperCase()],
+                ["Size", fileSize(photo.fileSize)],
+                ["Color space", metadataText(metadata?.colorSpace)],
+            ]} />
+        </aside>
+    );
 }
 
 function PhotoExpandedView({ photo }: { photo: Photo }) {
-    const [windowDim, setWindowDim] = useState<{width: number, height: number}>({width: 0, height: 0});
-    
-    useEffect(() => {
-        setWindowDim({width: window.innerWidth, height: window.innerHeight});
-    }, [])
+    const closeRef = useRef<HTMLButtonElement>(null);
+    const invokingControl = useRef<HTMLElement | null>(null);
+    const [hasError, setHasError] = useState(false);
+    const { width, height } = photoDimensions(photo);
 
     return (
-        <GenericDrawerContent style={{borderRadius: "0px"}} className="h-5/6 w-full bg-secondary border-t-1 border-primary">
-            <div className="flex flex-col lg:flex-row-reverse overflow-y-scroll mt-3 lg:h-full ">
-                <Image src={photo.webContentLink} alt={`photobook-${photo.webContentLink}`}
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    style={{width: windowDim.width < 1024 ? "100%" : "auto", height: windowDim.width < 1024 ? "auto" : "100%"}}
-                    />
-                <PhotoMetadataExpandedView metadata={{
-                    ...photo.imageMediaMetadata,
-                    fileSize: photo.fileSize as unknown as number,
-                    fileExtension: photo.fileExtension
-                }} />
+        <GenericDrawerContent className={styles.drawer} onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            invokingControl.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            setHasError(false);
+            closeRef.current?.focus();
+        }} onCloseAutoFocus={(event) => {
+            if (invokingControl.current?.isConnected) {
+                event.preventDefault();
+                invokingControl.current.focus({ preventScroll: true });
+            }
+        }}>
+            <header className={styles.header}>
+                <DrawerTitle className={styles.title}>Photo details</DrawerTitle>
+                <DrawerClose ref={closeRef} className={styles.close} aria-label="Close photo details">
+                    <X size={16} aria-hidden="true" /> Close
+                </DrawerClose>
+            </header>
+            <DrawerDescription className="sr-only">Full photograph and camera settings.</DrawerDescription>
+            <div className={styles.content} data-vaul-no-drag>
+                <figure className={styles.figure}>
+                    {hasError ? <div role="status" className={styles.imageError}>Photo unavailable. Close and reopen to try again.</div> :
+                        <Image src={photo.webContentLink} alt={photoDescription(photo)}
+                            width={width} height={height}
+                            sizes="(min-width: 1024px) calc(100vw - 376px), calc(100vw - 24px)"
+                            className={styles.image} onError={() => setHasError(true)} />}
+                </figure>
+                <PhotoMetadataExpandedView photo={photo} />
             </div>
         </GenericDrawerContent>
     )
 }
 
-function PhotoMiniView({ photo, wide }: { photo: Photo; wide: boolean }) {
+function PhotoMiniView({ photo, featured }: { photo: Photo; featured: boolean }) {
     const [isLoaded, setIsLoaded] = useState(false);
+    const [hasError, setHasError] = useState(false);
+    const [dimensions, setDimensions] = useState(() => photoDimensions(photo));
+    const { width, height } = dimensions;
+    const description = photoDescription(photo);
 
     return (
-        <div className="rounded-none border-primary sm:border sm:border-b-0 border-b-primary flex text-left flex-col justify-between h-full z-auto">
-            <div className="flex flex-col w-full max-w-full h-full overflow-x-hidden relative">
-                <Image className="transition-all duration-1000 object-cover" src={photo.webContentLink} alt={`photobook-${photo.webContentLink}`}
-                    onLoad={() => setIsLoaded(true)}
+        <div data-photo-id={photo.id} className="relative w-full rounded-none border-primary sm:border sm:border-b-0 text-left bg-secondary">
+            <div className="w-full overflow-hidden relative" style={{ aspectRatio: `${width} / ${height}` }}>
+                {!hasError && <Image className="transition-opacity duration-1000 motion-reduce:transition-none object-cover" src={photo.webContentLink} alt={description}
+                    onLoad={(event) => {
+                        const image = event.currentTarget;
+                        // Decoded dimensions win if imported metadata has already
+                        // applied orientation, or if its dimensions were missing.
+                        if (image.naturalWidth && image.naturalHeight && Math.abs(image.naturalWidth / image.naturalHeight - width / height) > .01) {
+                            setDimensions({ width: image.naturalWidth, height: image.naturalHeight });
+                        }
+                        setIsLoaded(true);
+                    }}
+                    onError={() => setHasError(true)}
                     fill
-                    sizes={wide ? "67vw" : "33vw"}
-                    style={{objectFit: "cover", opacity: isLoaded ? "1" : "0" }} />
-                <PhotoMetadataMiniView metadata={photo.imageMediaMetadata} />
+                    sizes={featured
+                        ? "(max-width: 639px) calc((200vw - 53px) / 3), calc((200vw - 60px) / 3)"
+                        : "(max-width: 639px) calc((100vw - 28px) / 3), calc((100vw - 48px) / 3)"}
+                    style={{objectFit: "cover", opacity: isLoaded ? "1" : "0" }} />}
+                {!isLoaded && !hasError && <Skeleton className="absolute inset-0 rounded-none" />}
+                {hasError && <div role="status" className="absolute inset-0 flex items-center justify-center bg-secondary p-2 text-center text-xs text-muted-foreground">Photo unavailable</div>}
+                {photo.imageMediaMetadata && <PhotoMetadataMiniView metadata={photo.imageMediaMetadata} />}
             </div>
-            {!isLoaded && <LoadingImage />}
-            <DrawerTrigger className="border-b-1 max-sm:hidden" label="view photo details" />
-            <div className="sm:hidden absolute top-3 right-3">
-                <DrawerTrigger className="border-b-1 sm:hidden px-3 border" label="" />
+            <DrawerTrigger className="border-b-1 max-sm:hidden" label="view photo details" ariaLabel={`View photo: ${description}`} />
+            <div className="sm:hidden absolute top-2 right-2">
+                <DrawerTrigger className="border-b-1 sm:hidden border h-11 min-h-11 min-w-11" label="" ariaLabel={`View photo: ${description}`} />
             </div>
         </div>
     )
 
 }
 
-export default function PhotoEntry({ photo, wide = false }: { photo: Photo; wide?: boolean }) {
+export default function PhotoEntry({ photo, featured = false }: { photo: Photo; featured?: boolean }) {
     return (
         <Drawer>
-            <PhotoMiniView photo={photo} wide={wide} />
+            <PhotoMiniView key={photo.webContentLink} photo={photo} featured={featured} />
             <PhotoExpandedView photo={photo} />
         </Drawer>
     )

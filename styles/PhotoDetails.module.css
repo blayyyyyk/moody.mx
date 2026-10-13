@@ -1,0 +1,174 @@
+.drawer[data-slot="drawer-content"] {
+    height: 80dvh;
+    max-height: 80dvh;
+    border-radius: 0;
+    border-top: 1px solid hsl(var(--primary));
+    background: hsl(var(--secondary));
+    color: hsl(var(--primary));
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+.drawer > div:first-child {
+    height: 4px;
+    width: 48px;
+    margin-top: 8px;
+    border-radius: 0;
+    background: hsl(var(--primary));
+}
+
+.header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 12px 8px;
+    border-bottom: 1px solid hsl(var(--primary));
+}
+
+.header .title {
+    margin: 0;
+    color: inherit;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid hsl(var(--primary));
+    background: hsl(var(--secondary));
+    color: hsl(var(--primary));
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.close:hover {
+    background: hsl(var(--primary));
+    color: hsl(var(--secondary));
+}
+
+.close:focus-visible,
+.metadata:focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 2px;
+}
+
+.content {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 12px 12px max(12px, env(safe-area-inset-bottom));
+    scrollbar-color: hsl(var(--primary)) hsl(var(--secondary));
+}
+
+.figure {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    place-items: center;
+    min-width: 0;
+    margin: 0 0 12px;
+    border: 1px solid hsl(var(--primary));
+    background-color: hsl(var(--secondary));
+    background-image: repeating-linear-gradient(45deg, transparent 0 11px, hsl(var(--primary)) 11px 12px);
+}
+
+.image {
+    display: block;
+    /* Keep the element's painted box fitted to its intrinsic image ratio.
+       Flex shrinking can narrow that box without recomputing its height. */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 45dvh;
+    object-fit: contain;
+    background: hsl(var(--secondary));
+    border-inline: 1px solid hsl(var(--primary));
+}
+
+.imageError {
+    padding: 24px;
+    font-size: 14px;
+    background: hsl(var(--secondary));
+}
+
+.metadata {
+    min-width: 0;
+    font-size: 12px;
+    line-height: 16px;
+    font-variant-numeric: tabular-nums;
+    scrollbar-color: hsl(var(--primary)) hsl(var(--secondary));
+}
+
+.group + .group {
+    margin-top: 16px;
+}
+
+.group h3 {
+    margin: 0 0 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid hsl(var(--primary));
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.group dl {
+    margin: 0;
+}
+
+.entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 12px;
+    padding: 4px 0;
+    align-items: baseline;
+}
+
+.entry dt {
+    color: hsl(var(--muted-foreground));
+}
+
+.entry dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (min-width: 1024px) {
+    .content {
+        display: grid;
+        flex: 1;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 12px;
+        overflow: hidden;
+    }
+
+    .figure {
+        min-height: 0;
+        margin: 0;
+    }
+
+    .image {
+        max-height: 100%;
+    }
+
+    .metadata {
+        overflow: auto;
+        overscroll-behavior: contain;
+        padding: 0 4px 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .drawer[data-slot="drawer-content"],
+    :global([data-slot="drawer-overlay"]):has(+ .drawer) {
+        animation: none !important;
+        transition: none !important;
+    }
+}
