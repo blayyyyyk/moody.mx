@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "spotify:connect": "node scripts/spotify-connect.mjs",
-    "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts",
+    "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts && node --test tests/spotify-connect.test.mjs",
     "test:music": "playwright test"
   },
   "dependencies": {
