@@ -4,6 +4,22 @@
 
 Read `DESIGN.md` before changing frontend layout, styling, or motion. It is the visual authority for Blake's personal portfolio. Keep additional durable project guidance in this file rather than creating separate product, design-contract, or completion-report documents.
 
+## Photos
+
+Use three-column natural-aspect masonry with a sparse, random selection of double-width photos on each page load. Select featured IDs server-side so hydration, resizing, and drawer interactions keep the same selection. Preserve primary-colored square frames, compact desktop gutters, hairline mobile gaps, original image colors, and existing drawers. New uploads should flow without manual placement.
+
+The first row contains equal-width top, side, and front outline SVG views of the Sony α7 III with an attached FE 28–70mm lens. Render them as one bordered strip with 1px primary-color dividers. Keep the views and camera lettering vector-based, using the same neutral line-art treatment as the turntable.
+
+The camera illustrations use the approved 12° hidden-line traces from `a7.glb`, with a separate vector-lettering layer. Keep their geometry unchanged when editing markings. Commit `c5c0a75` checkpoints the unlettered traces after the main rebase; `camera:lettering` verifies those source hashes before regenerating the annotated assets.
+
+## Owner photo uploads
+
+- Footer Google sign-in is restricted to the verified account in `PHOTO_ADMIN_EMAIL`. Provider tokens remain server-only inside encrypted HttpOnly sessions; every upload request verifies ownership and uses the configured gallery folder.
+- Configure the Google OAuth Web client with `${siteOrigin}/api/auth/callback/google`, enable Drive API, and use `.env.example` for variable names. `NEXTAUTH_URL` must match that environment's registered origin. `photo:auth:setup` initializes local session settings without printing credentials.
+- EXIF edits run locally in a worker and are read back before upload. JPEG/PNG pixels are not recompressed. RAW uploads retain the edited RAW and add a JPEG companion; only the JPEG enters the gallery. Other embedded metadata stays in the original file.
+- Drive uploads use resumable 2 MB chunks and owner-bound encrypted tickets. Completed uploads invalidate the cached photo feed; keep Google's metadata caching for normal visitors. Test writes with fixtures, not Blake's live gallery.
+- `predev`/`prebuild` prepare the self-hosted WASM tools; these large assets load only when the owner opens the editor. Keep setup guidance here rather than creating extra documents.
+
 ## Music
 
 - Preserve the desktop one-viewport composition: history/search at left, top track above top artist in the middle, and a top-down Sony PS-LX310BT line-art turntable at right. Mobile flows vertically. Music's anchor must clear the sticky navigation.
