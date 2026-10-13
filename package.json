@@ -9,12 +9,14 @@
     "lint": "next lint",
     "spotify:connect": "node scripts/spotify-connect.mjs",
     "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts && node --test tests/spotify-connect.test.mjs",
-    "test:music": "playwright test",
+    "test:music": "playwright test tests/browser/music.spec.ts",
     "test:projects": "playwright test --config playwright.projects.config.ts",
     "test:github": "NODE_OPTIONS=--conditions=react-server tsx --test tests/github.test.ts",
     "models:prepare": "node scripts/prepare-models.mjs",
     "models:benchmark": "node scripts/benchmark-models.mjs",
-    "test:models": "node --experimental-strip-types --test tests/model-assets.test.mjs"
+    "perf:measure": "node scripts/run-performance.mjs",
+    "test:models": "node --experimental-strip-types --test tests/model-assets.test.mjs",
+    "test:performance": "playwright test tests/browser/performance.spec.ts --config playwright.performance.config.ts"
   },
   "dependencies": {
     "@next/env": "^15.1.7",
