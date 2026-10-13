@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, GitCommitHorizontal, Star, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUpRight, ChevronDown, ChevronUp, GitCommitHorizontal, Star, X } from "lucide-react";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -143,13 +143,58 @@ function ProjectRow({ project }: { project: GitHubProject }) {
   </li>;
 }
 
+function ProjectList({ projects }: { projects: GitHubProject[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLUListElement>(null);
+  const [edges, setEdges] = useState({ above: false, below: false });
+  const updateEdges = useCallback(() => {
+    const node = scrollRef.current;
+    if (!node) return;
+    const above = node.scrollTop > 2;
+    const below = node.scrollHeight - node.clientHeight - node.scrollTop > 2;
+    setEdges(previous => previous.above === above && previous.below === below ? previous : { above, below });
+  }, []);
+
+  useEffect(() => {
+    const observer = new ResizeObserver(updateEdges);
+    if (scrollRef.current) observer.observe(scrollRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+    updateEdges();
+    return () => observer.disconnect();
+  }, [updateEdges]);
+
+  function scrollProjects(direction: -1 | 1) {
+    const node = scrollRef.current;
+    if (!node) return;
+    node.scrollBy({ top: direction * node.clientHeight * 0.75, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  }
+
+  return <div className={styles.projectViewport}>
+    <div ref={scrollRef} className={styles.projectScroll} onScroll={updateEdges} tabIndex={0} role="region" aria-label="Starred project list"
+      onKeyDown={event => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === "PageDown" || event.key === "PageUp") {
+          event.preventDefault();
+          scrollProjects(event.key === "PageDown" ? 1 : -1);
+        } else if (event.key === "Home" || event.key === "End") {
+          event.preventDefault();
+          event.currentTarget.scrollTo({ top: event.key === "Home" ? 0 : event.currentTarget.scrollHeight });
+        }
+      }}>
+      <ul ref={contentRef} className={styles.list}>{projects.map(project => <ProjectRow key={project.fullName} project={project} />)}</ul>
+    </div>
+    <button type="button" className={`${styles.scrollArrow} ${styles.scrollUp}`} data-visible={edges.above} disabled={!edges.above} aria-hidden={!edges.above} aria-label="Scroll projects up" onClick={() => scrollProjects(-1)}><ChevronUp size={20} aria-hidden="true" /></button>
+    <button type="button" className={`${styles.scrollArrow} ${styles.scrollDown}`} data-visible={edges.below} disabled={!edges.below} aria-hidden={!edges.below} aria-label="Scroll projects down" onClick={() => scrollProjects(1)}><ChevronDown size={20} aria-hidden="true" /></button>
+  </div>;
+}
+
 export default function ProjectsExplorer({ data }: { data: ProjectsData }) {
   return <div className={styles.explorer}>
     <Contributions calendar={data.calendar} />
     <div className={styles.columns}>
       <div className={styles.repositories}>
         <div className={styles.bar}><h2><Star size={16} aria-hidden="true" /> Starred projects</h2><span>{data.projects.length.toString().padStart(2, "0")} repositories</span></div>
-        {data.projects.length ? <ul className={styles.list}>{data.projects.map(project => <ProjectRow key={project.fullName} project={project} />)}</ul> : <div className={styles.empty}>{data.projectsUnavailable ? "Projects couldn’t be loaded right now." : "No starred projects to show yet."}<a href={`${profile}?tab=repositories`}>Browse repositories on GitHub <ArrowUpRight size={14} /></a></div>}
+        {data.projects.length ? <ProjectList projects={data.projects} /> : <div className={styles.empty}>{data.projectsUnavailable ? "Projects couldn’t be loaded right now." : "No starred projects to show yet."}<a href={`${profile}?tab=repositories`}>Browse repositories on GitHub <ArrowUpRight size={14} /></a></div>}
       </div>
       <aside className={styles.activity} aria-label="Recent GitHub activity">
         <div className={styles.bar}><h2><GitCommitHorizontal size={16} aria-hidden="true" /> Recent activity</h2><span>Public</span></div>

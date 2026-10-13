@@ -11,6 +11,15 @@ test("projects fit every responsive boundary in both themes", async ({ browser, 
       if (theme === "dark") await expect(page.locator("html")).toHaveClass(/dark/);
       await expect(section.locator("[class*=explorer]")).toHaveCSS("background-color", theme === "dark" ? "rgb(31, 31, 31)" : "rgb(245, 245, 245)");
       await expect(section.locator("button[data-date][tabindex='0']")).toHaveCount(1);
+      await expect(section.locator("button[data-level='4']").first()).toHaveCSS("background-color", theme === "dark" ? "rgb(215, 38, 255)" : "rgb(14, 227, 128)");
+      await expect(section.getByRole("region", { name: "Starred project list" })).toHaveCSS("scrollbar-width", "none");
+      const dividerInsets = await section.locator("li[class*=project]").first().evaluate(row => {
+        const card = row.getBoundingClientRect();
+        const footer = row.querySelector("[class*=projectFooter]")!.getBoundingClientRect();
+        return { left: Math.abs(card.left - footer.left), right: Math.abs(card.right - footer.right) };
+      });
+      expect(dividerInsets.left).toBeLessThan(1);
+      expect(dividerInsets.right).toBeLessThan(1);
       await section.evaluate(element => element.scrollIntoView({ block: "start" }));
       const overflow = await section.evaluate(element => {
         const bounds = element.getBoundingClientRect();
@@ -28,6 +37,33 @@ test("projects fit every responsive boundary in both themes", async ({ browser, 
       await page.close();
     }
   }
+});
+
+for (const width of [320, 1440]) test(`project list arrows follow scroll boundaries at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const list = page.getByRole("region", { name: "Starred project list" });
+  const down = page.getByRole("button", { name: "Scroll projects down", includeHidden: true });
+  const up = page.getByRole("button", { name: "Scroll projects up", includeHidden: true });
+  await expect(up).toBeDisabled();
+  await expect(down).toBeEnabled();
+  await down.click();
+  await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  await expect(up).toBeEnabled();
+  await list.evaluate(element => { element.scrollTop = element.scrollHeight; });
+  await expect(down).toBeDisabled();
+  await expect(down).toHaveAttribute("data-visible", "false");
+  await up.click();
+  await expect(down).toBeEnabled();
+  await list.evaluate(element => { element.scrollTop = 0; });
+  await expect(up).toBeDisabled();
+  await expect(up).toHaveAttribute("data-visible", "false");
+  await list.focus();
+  await expect(list).toBeFocused();
+  await list.press("PageDown");
+  // Reduced motion makes this an immediate scroll; read its result directly.
+  expect(await list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
 });
 
 for (const width of [320, 390, 768, 1440]) test(`README supports markdown, retry and keyboard at ${width}px`, async ({ page }) => {
