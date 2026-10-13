@@ -9,7 +9,8 @@
     "lint": "next lint",
     "spotify:connect": "node scripts/spotify-connect.mjs",
     "test:spotify": "NODE_OPTIONS=--conditions=react-server tsx --test tests/spotify.test.ts && node --test tests/spotify-connect.test.mjs",
-    "test:music": "playwright test"
+    "test:music": "playwright test",
+    "test:projects": "playwright test --config playwright.projects.config.ts"
   },
   "dependencies": {
     "@next/env": "^15.1.7",
@@ -53,6 +54,7 @@
     "reactflow": "^11.11.4",
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
+    "rehype-slug": "^6.0.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
