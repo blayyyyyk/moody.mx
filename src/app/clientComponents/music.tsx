@@ -7,10 +7,6 @@ import Turntable from "./turntable";
 import type { MusicSnapshot, MusicTrack, QueueAllowance } from "@/lib/spotify-types";
 import styles from "../../../styles/Music.module.css";
 
-function SpotifyLogo() {
-    return <svg viewBox="0 0 24 24" className={styles.spotifyLogo} aria-hidden="true"><path fill="currentColor" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.25c-2.82-1.73-6.36-2.12-10.54-1.17a.75.75 0 0 1-.33-1.46c4.57-1.04 8.49-.59 11.65 1.35.35.22.46.68.25 1.03Zm1.47-3.26a.94.94 0 0 1-1.29.31c-3.22-1.98-8.13-2.55-11.94-1.39a.94.94 0 0 1-.55-1.8c4.35-1.32 9.76-.68 13.47 1.59.44.27.58.85.31 1.29Zm.13-3.4C15.24 8.35 8.88 8.14 5.2 9.26a1.13 1.13 0 0 1-.66-2.16c4.22-1.28 11.24-1.03 15.71 1.62a1.13 1.13 0 0 1-1.15 1.94Z" /></svg>;
-}
-
 function Artwork({ src, alt, className }: { src?: string | null; alt: string; className?: string }) {
     const [failed, setFailed] = useState(false);
     useEffect(() => setFailed(false), [src]);
@@ -159,7 +155,7 @@ export default function Music() {
 
     return (
         <section className={styles.section} aria-labelledby="music">
-            <Heading className={`border-primary border p-3 ${styles.heading}`} icon={<SpotifyLogo />}>Music</Heading>
+            <Heading className={`border-primary border p-3 ${styles.heading}`}>Music</Heading>
             <div className={styles.grid}>
                 <div className={`${styles.panel} ${styles.history}`}>
                     <div className={styles.searchBar}>

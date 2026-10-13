@@ -1,6 +1,5 @@
 .section { margin: 0 12px 12px; display: flex; flex-direction: column; gap: 12px; }
 .heading { flex-shrink: 0; scroll-margin-top: 90px; }
-.spotifyLogo { width: 0.6em; height: 0.6em; color: #1db954; flex-shrink: 0; position: relative; }
 .grid { display: grid; gap: 12px; min-height: 0; }
 .panel { border: 1px solid hsl(var(--primary)); min-width: 0; min-height: 0; }
 .panelLabel { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid hsl(var(--primary)); font-size: 12px; line-height: 16px; }
