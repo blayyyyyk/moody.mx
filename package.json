@@ -22,6 +22,7 @@
     "mal:connect": "node scripts/mal-connect.mjs",
     "test:mal": "NODE_OPTIONS=--conditions=react-server tsx --test tests/mal.test.ts",
     "test:mal:browser": "playwright test --config playwright.mal.config.ts",
+    "test:ribbons": "tsx --test tests/ribbons.test.ts",
     "test:photos": "NODE_OPTIONS=--conditions=react-server tsx --test tests/photos.test.ts",
     "camera:prototype": "node scripts/prototype-camera-trace.mjs",
     "camera:lettering": "node scripts/annotate-camera-traces.mjs",

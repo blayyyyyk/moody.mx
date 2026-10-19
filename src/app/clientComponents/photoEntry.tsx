@@ -31,7 +31,7 @@ import { Badge } from "@/components/ui/badge";
 
 function PhotoMetadataMiniView({ metadata }: { metadata: ImageMediaMetadata }) {
     return (
-        <div className="w-full font-mono text-xs border-primary absolute bottom-0 bg-secondary max-sm:hidden">
+        <div data-ribbon-under className="w-full font-mono text-xs border-primary absolute bottom-0 bg-secondary max-sm:hidden">
             <Marquee pauseOnHover className="border-t-1 border-primary flex flex-row items-center">
                 <Badge className="bg-secondary text-primary">
                     <Calendar data-icon="inline-start" className="stroke-primary" />
@@ -185,7 +185,7 @@ function PhotoMiniView({ photo, featured }: { photo: Photo; featured: boolean })
 
     return (
         <div data-photo-id={photo.id} className="relative w-full rounded-none border-primary sm:border sm:border-b-0 text-left bg-secondary">
-            <div className="w-full overflow-hidden relative" style={{ aspectRatio: `${width} / ${height}` }}>
+            <div data-ribbon-visual className="w-full overflow-hidden relative" style={{ aspectRatio: `${width} / ${height}` }}>
                 {!hasError && <Image className="transition-opacity duration-1000 motion-reduce:transition-none object-cover" src={photo.webContentLink} alt={description}
                     onLoad={(event) => {
                         const image = event.currentTarget;
@@ -207,7 +207,7 @@ function PhotoMiniView({ photo, featured }: { photo: Photo; featured: boolean })
                 {photo.imageMediaMetadata && <PhotoMetadataMiniView metadata={photo.imageMediaMetadata} />}
             </div>
             <DrawerTrigger className="border-b-1 max-sm:hidden" label="view photo details" ariaLabel={`View photo: ${description}`} />
-            <div className="sm:hidden absolute top-2 right-2">
+            <div data-ribbon-under className="sm:hidden absolute top-2 right-2">
                 <DrawerTrigger className="border-b-1 sm:hidden border h-11 min-h-11 min-w-11" label="" ariaLabel={`View photo: ${description}`} />
             </div>
         </div>

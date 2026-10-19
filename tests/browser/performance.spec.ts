@@ -90,6 +90,8 @@ for (const width of [1280, 390]) {
             await page.goto("/");
             await expect(page.locator("[data-hero-animated] pre")).not.toHaveText("");
             await page.screenshot({ path: `test-results/hero-${width}-${theme}.png` });
+            // Model snapshots check the wireframes themselves, not the decorative section ribbons drawn over them.
+            await page.addStyleTag({ content: "[data-ribbon-layer] { visibility: hidden !important; }" });
             for (const [section, model] of [["publications", "simplify_Enchiridion_"], ["timeline", "RTX_3080_FE"]]) {
                 await page.locator(`#${section}`).first().scrollIntoViewIfNeeded();
                 const node = page.locator(`[data-model="${model}"]`);

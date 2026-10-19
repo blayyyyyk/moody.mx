@@ -149,21 +149,32 @@ void main() {
 
 const ASCII_FONT_SIZE = 2 / 0.15
 const ASCII_CHARACTER_GAP = 3
+// Phones get a denser grid so the contour lines resolve instead of reading as noise.
+const COMPACT_WIDTH = 640
+const COMPACT_FONT_SIZE = 5
+const COMPACT_CHARACTER_GAP = 0.5
 
 function AsciiRenderer({ characters = ' .:*o&8@B', active, reduced }) {
   const { gl, scene, camera, size } = useThree()
   const lastFrame = useRef(-Infinity)
-  const columns = Math.max(1, Math.floor(size.width / (ASCII_FONT_SIZE * 0.6 + ASCII_CHARACTER_GAP)))
-  const rows = Math.max(1, Math.floor(size.height * 0.15))
+  const compact = size.width < COMPACT_WIDTH
+  const fontSize = compact ? COMPACT_FONT_SIZE : ASCII_FONT_SIZE
+  const gap = compact ? COMPACT_CHARACTER_GAP : ASCII_CHARACTER_GAP
+  const columns = Math.max(1, Math.floor(size.width / (fontSize * 0.6 + gap)))
+  // Two render rows per text line: only every other row is read back.
+  const rows = Math.max(1, Math.floor(size.height * 2 / fontSize))
   const target = useMemo(() => new THREE.WebGLRenderTarget(columns, rows, { depthBuffer: false, stencilBuffer: false }), [columns, rows])
   const pixels = useMemo(() => new Uint8Array(columns * rows * 4), [columns, rows])
   const text = useMemo(() => {
     const node = document.createElement('pre')
     node.setAttribute('aria-hidden', 'true')
     node.className = 'absolute top-0 left-0 pointer-events-none bg-secondary text-primary'
-    Object.assign(node.style, { margin: '0', padding: '0', border: '0', width: '100%', height: '100%', overflow: 'hidden', fontFamily: 'var(--font-jetbrains-mono), monospace', fontSize: `${ASCII_FONT_SIZE}px`, lineHeight: `${ASCII_FONT_SIZE}px`, letterSpacing: `${ASCII_CHARACTER_GAP}px`, whiteSpace: 'pre' })
+    Object.assign(node.style, { margin: '0', padding: '0', border: '0', width: '100%', height: '100%', overflow: 'hidden', fontFamily: 'var(--font-jetbrains-mono), monospace', whiteSpace: 'pre' })
     return node
   }, [])
+  useEffect(() => {
+    Object.assign(text.style, { fontSize: `${fontSize}px`, lineHeight: `${fontSize}px`, letterSpacing: `${gap}px` })
+  }, [text, fontSize, gap])
   useEffect(() => {
     gl.domElement.parentNode.appendChild(text)
     return () => text.remove()
