@@ -106,7 +106,7 @@ export default function Turntable({ track }: { track: MusicTrack | null }) {
     const playing = track !== null;
     const image = track?.image && track.image !== failedArtwork ? track.image : null;
 
-    return <svg className={styles.turntable} viewBox="0 0 1200 1040" role="img" aria-labelledby={`${id}-title ${id}-description`} data-playing={playing}>
+    return <svg data-ribbon-visual className={styles.turntable} viewBox="0 0 1200 1040" role="img" aria-labelledby={`${id}-title ${id}-description`} data-playing={playing}>
         <title id={`${id}-title`}>Sony PS-LX310BT record player</title>
         <desc id={`${id}-description`}>{playing ? `Playing ${track.name} by ${track.artist}. The vinyl and circular album-art label spin clockwise beneath the tonearm.` : "Playback is stopped. The platter is empty and the tonearm is parked in its rest."}</desc>
         <defs>

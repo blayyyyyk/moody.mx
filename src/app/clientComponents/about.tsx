@@ -44,10 +44,10 @@ export default function AboutMe() {
                         </Button>
                     </div>
                 </div>
-                <div className="w-full h-1/2 min-h-[50vh] md:h-full relative border border-primary">
+                <div data-ribbon-visual className="w-full h-1/2 min-h-[50vh] md:h-full relative border border-primary">
                     <Image src={PROFILE_IMAGE} alt={PROFILE_IMAGE} style={imageStyle}
                         fill />
-                    <div className="w-full p-2 absolute top-0 text-center bg-secondary border-b border-primary shadow-lg">
+                    <div data-ribbon-under className="w-full p-2 absolute top-0 text-center bg-secondary border-b border-primary shadow-lg">
                         Photo taken by Kendal Brosnan
                     </div>
                 </div>

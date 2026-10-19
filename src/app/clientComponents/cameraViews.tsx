@@ -161,12 +161,12 @@ function CameraCell({ view, children }: { view: string; children: ReactNode }) {
             <title>{`Sony α7 III — ${view.toLowerCase()} view`}</title>
             <g fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</g>
         </svg>
-        <figcaption className={styles.caption}><span>α7 III</span><span>{view}</span></figcaption>
+        <figcaption data-ribbon-under className={styles.caption}><span>α7 III</span><span>{view}</span></figcaption>
     </figure>;
 }
 
 export default function CameraViews() {
-    return <div className={styles.row} aria-label="Sony α7 III camera views">
+    return <div data-ribbon-visual className={styles.row} aria-label="Sony α7 III camera views">
         <CameraCell view="Top"><TopView /></CameraCell>
         <CameraCell view="Side"><SideView /></CameraCell>
         <CameraCell view="Front"><FrontView /></CameraCell>

@@ -14,6 +14,7 @@ import Music from "./clientComponents/music";
 import { Suspense } from "react";
 import Heading from "./clientComponents/heading";
 import MangaAnime from "./clientComponents/mangaAnime";
+import RibbonSection from "./clientComponents/ribbons";
 
 function SectionLoading({ title }: { title: string }) {
     return <div className="mx-3 mb-3" aria-busy="true">
@@ -29,13 +30,13 @@ export default function Home() {
         >
             <Profile />
             <NavigationMenu />
-            <AboutMe />
-            <Suspense fallback={<SectionLoading title="Publications" />}><PublicationsList /></Suspense>
-            <Suspense fallback={<SectionLoading title="Timeline" />}><Timeline /></Suspense>
-            <Suspense fallback={<SectionLoading title="Projects" />}><Projects /></Suspense>
-            <Music />
-            <MangaAnime />
-            <Suspense fallback={<SectionLoading title="Photos" />}><Photobook /></Suspense>
+            <RibbonSection title="About"><AboutMe /></RibbonSection>
+            <RibbonSection title="Publications"><Suspense fallback={<SectionLoading title="Publications" />}><PublicationsList /></Suspense></RibbonSection>
+            <RibbonSection title="Timeline"><Suspense fallback={<SectionLoading title="Timeline" />}><Timeline /></Suspense></RibbonSection>
+            <RibbonSection title="Projects"><Suspense fallback={<SectionLoading title="Projects" />}><Projects /></Suspense></RibbonSection>
+            <RibbonSection title="Music"><Music /></RibbonSection>
+            <RibbonSection title="Manga/Anime"><MangaAnime /></RibbonSection>
+            <RibbonSection title="Photos"><Suspense fallback={<SectionLoading title="Photos" />}><Photobook /></Suspense></RibbonSection>
             <Footer />
         </div>
     );

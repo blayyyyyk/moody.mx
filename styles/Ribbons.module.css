@@ -1,0 +1,40 @@
+.root {
+    position: relative;
+    isolation: isolate;
+    /* Contain child margins so the ribbons span the section's full extent. */
+    display: flow-root;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+.layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+.back {
+    z-index: 0;
+}
+
+.front {
+    z-index: 2;
+    transition: opacity 500ms ease;
+}
+
+.front[data-settled="true"] {
+    opacity: 0;
+}
+
+.tile {
+    position: absolute;
+    left: 0;
+    width: 100%;
+}

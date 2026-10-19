@@ -2,7 +2,20 @@
 
 ## Design and documentation
 
+In-page scrolling lists (Music, Manga/Anime, Projects) must hand scrolling back to the page at their top and bottom, so do not give them `overscroll-behavior: contain`. Only drawers and dialogs contain overscroll.
+
 Read `DESIGN.md` before changing frontend layout, styling, or motion. It is the visual authority for Blake's personal portfolio. Keep additional durable project guidance in this file rather than creating separate product, design-contract, or completion-report documents.
+
+## Section ribbons
+
+Each main section (About through Photos) is wrapped in `RibbonSection` with its title. They are drawn live on canvas, not video: a band in the page surface color with 1px primary edges along both sides, and the uppercase title in primary tiled along it and scrolled as a marquee. Shapes are seeded by the title and section size, and some ribbons curl into a single loop.
+
+- Ribbons must not obstruct reading. The default is `settle`: while the page scrolls, ribbons weave over alternating bordered cards; once scrolling stops for 0.9s, the layer above the content fades out. At rest, ribbons show only in gutters and open space, so content is unobstructed.
+- Blake compared alternatives on 2026-10-18 with `?ribbons=` (comma-separated: `weave`, `visuals`, `fade`, `settle`, `clear`) and chose `settle`. At rest it covers 0% of on-screen text; always-on weaving covered about 11% on desktop. `visuals` routes ribbons over only `[data-ribbon-visual]` elements (headings, portrait, camera strip, photos, turntable, book/GPU) and keeps `[data-ribbon-under]` text (titles, captions, metadata) on top. `clear` eases ribbons away from a hovered or focused target. Keep those tags when editing the tagged components.
+- Depth comes from two layers. The back layer sits behind the content with every card (all four borders, at least 96 × 40px, outermost only) and visual erased. The front layer sits above the content. Panels stay transparent; do not add backgrounds to fake occlusion.
+- A loop's exit must draw over its entry, so ribbons render in chunks that overlap their joins. Glyphs are placed from one precomputed arc-length table per ribbon, which keeps the marquee continuous across chunks.
+- Do not move the marquee back to SVG `textPath`: Firefox re-lays out the text on every offset change, which dropped the page to about 20fps. Canvases are 512px tiles that scroll natively with the section; only tiles near the viewport keep pixel buffers and redraw.
+- Both layers are `aria-hidden`, ignore pointer events, and have `data-ribbon-layer`. The marquee pauses offscreen and in hidden tabs. Under reduced motion it keeps a slow drift (one third speed), matching the ASCII hero. Model snapshot tests hide the ribbons, because those snapshots verify the wireframes.
 
 ## Photos
 
@@ -47,6 +60,7 @@ Keep `.env.local` as the local environment source: pull Vercel values through a 
 - Runtime wireframe assets are generated from the original STLs with `npm run models:prepare`. Preserve those source assets. The generator simplifies the solid mesh while retaining original sharp outlines; `public/models/manifest.json` records source hashes and error bounds.
 - Keep STL parsing, vertex welding, and edge generation offline. Runtime decoding creates typed-array views into the downloaded buffer without reconstructing geometry.
 - Mount model renderers near the viewport and pause offscreen, hidden-tab, and reduced-motion animation. Verify first load and first scroll so deferred loading does not just postpone a stall.
+- Below 640px the ASCII hero uses 5px characters with a 0.5px gap (desktop: 13.3px with a 3px gap). This gives phones about 110 columns, so the contour lines resolve instead of reading as noise.
 - The ASCII hero stays alive while visible: full motion normally, slow drift without pointer distortion under reduced motion. Pause it offscreen and in hidden tabs, resuming without a time jump.
 - Measure production builds on a consistent browser/device setup. `perf:measure` reports local lab measurements, not real-user guarantees. Preserve the initial identity/links, ASCII landscape, and model appearance while optimizing.
 - `npm run test:performance` and `npm run perf:measure` build against synthetic GitHub/Google fixtures in `.next-performance`, so book, GPU, and photo coverage cannot disappear with missing credentials or contaminate a production build. `perf:measure` enforces the checked-in local budgets; set `PERF_ASSERT=0` only for exploratory measurements.

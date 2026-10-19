@@ -12,7 +12,7 @@
 .searchBar:focus-within { outline: 2px solid hsl(var(--ring)); outline-offset: -3px; }
 .searchBar input:disabled { cursor: not-allowed; }
 .trackViewport { position: relative; display: flex; flex: 1; min-height: 0; }
-.trackScroll { overflow-y: auto; scrollbar-width: none; max-height: 480px; flex: 1; min-width: 0; overscroll-behavior-y: contain; }
+.trackScroll { overflow-y: auto; scrollbar-width: none; max-height: 480px; flex: 1; min-width: 0; }
 .trackScroll::-webkit-scrollbar { display: none; }
 .scrollArrow { position: absolute; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; display: grid; place-items: center; background: hsl(var(--secondary)); border: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); border-radius: 0; z-index: 1; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out; }
 .scrollArrow[data-visible="true"] { opacity: 1; pointer-events: auto; }
